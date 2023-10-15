@@ -40,7 +40,7 @@ class Review(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Recenzja {self.user} - {self.book}"
+        return f"Review {self.user} - {self.book}"
 
 class Wishlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
