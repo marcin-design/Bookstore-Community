@@ -129,3 +129,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 GOOGLE_BOOKS_API_KEY = 'AIzaSyBw14gSfuKgN5jxYJ29cgwUWI7FTbHET1Q'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 GOOGLE_BOOKS_API_KEY = 'AIzaSyBw14gSfuKgN5jxYJ29cgwUWI7FTbHET1Q'
+LOGIN_URL = '/login/'

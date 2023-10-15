@@ -46,7 +46,7 @@ class LoginView(View):
                 return render(request, 'bookstore_app/login.html', {'form': form})
 
 
-
+@login_required
 def main_page(request):
     api_url = "https://www.googleapis.com/books/v1/volumes"
     api_key = settings.GOOGLE_BOOKS_API_KEY
@@ -68,3 +68,6 @@ def main_page(request):
                   'bookstore_app/main.html',
                   {'books': books})
 
+def logout_view(request):
+    logout(request)
+    return render(request, 'bookstore_app/logout.html')
