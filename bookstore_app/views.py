@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
@@ -32,18 +32,23 @@ class RegistrationView(View):
 class LoginView(View):
     def get(self, request, *args, **kwargs):
         form = LoginForm()
-        return render(request, 'bookstore_app/login.html', {'form': form})
+        return render(request,
+                      'bookstore_app/login.html',
+                      {'form': form})
 
     def post(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            user = User.objects.filter(Q(username=username) | Q(email=email)).first()
-            if user:
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
                 return redirect('main')
             else:
                 return render(request, 'bookstore_app/login.html', {'form': form})
+        else:
+            return render(request, 'bookstore_app/login.html', {'form': form})
 
 
 @login_required
