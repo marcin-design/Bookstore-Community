@@ -8,6 +8,8 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist
 from .forms import *
+import requests
+from Bookstore_project import settings
 
 
 class RegistrationView(View):
@@ -39,7 +41,30 @@ class LoginView(View):
             email = form.cleaned_data['email']
             user = User.objects.filter(Q(username=username) | Q(email=email)).first()
             if user:
-                return redirect('main page')
+                return redirect('main')
             else:
                 return render(request, 'bookstore_app/login.html', {'form': form})
+
+
+
+def main_page(request):
+    api_url = "https://www.googleapis.com/books/v1/volumes"
+    api_key = settings.GOOGLE_BOOKS_API_KEY
+
+    params = {
+        "q": "Harry Potter",
+        "key": api_key,
+    }
+
+    response = requests.get(api_url, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        books = data.get("items", [])
+    else:
+        books = []
+
+    return render(request,
+                  'bookstore_app/main.html',
+                  {'books': books})
 

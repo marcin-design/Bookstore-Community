@@ -6,4 +6,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('registration/', bk_views.RegistrationView.as_view(), name='registration'),
     path('login/', bk_views.LoginView.as_view(), name='login'),
+    path('main/', bk_views.main_page, name='main')
 ]

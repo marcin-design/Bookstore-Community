@@ -22,6 +22,7 @@ class UserProfile(models.Model):
                                      on_delete=models.SET_NULL,
                                      null=True, blank=True,
                                      related_name='currently_reading')
+    has_access = models.BooleanField(default=True)
 
 
 class Friendship(models.Model):
