@@ -77,8 +77,25 @@ def logout_view(request):
     logout(request)
     return render(request, 'bookstore_app/logout.html')
 
-
+@login_required
 def user_view(request):
     return render(request,
                   'bookstore_app/user_profile.html',
                   {'user': request.user})
+
+
+class FriendsListView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        friends = Friendship.objects.filter(user=user)
+        return render(request,
+                      'bookstore_app/friends_list.html',
+                      {'friends': friends})
+
+
+class WishlistView(View):
+    def get(self, request, *args, **kwargs):
+        form = WishlistForm()
+        return render(request,
+                      'bookstore_app/wishlist.html',
+                      {'form': form})

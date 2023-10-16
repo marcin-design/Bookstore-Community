@@ -1,0 +1,19 @@
+{% extends 'bookstore_app/base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Friends</title>
+</head>
+<body>
+    <h1>Your Friends</h1>
+    <ul>
+        {% for friend in friends %}
+            <li>{{ friend.friend.username }}</li>
+        {% empty %}
+            <li>You don't have any friends yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+{% endblock %}

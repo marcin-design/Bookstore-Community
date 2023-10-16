@@ -1,9 +1,19 @@
+{% extends 'bookstore_app/base.html' %}
+{% block content %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Yours Page</title>
+    <title>Your Page</title>
 </head>
 <body>
     <h1>Welcome, {{ user.first_name }}</h1>
+    <h3>Your Profile</h3>
+    <form method="get" action="{% url 'list_of_friends' %}">
+        <input type="submit" value="List of friends">
+    </form>
+    <form method="get" action="{% url 'wishlist' %}">
+        <input type="submit" value="Wishlist">
+    </form>
 </body>
 </html>
+{% endblock %}
