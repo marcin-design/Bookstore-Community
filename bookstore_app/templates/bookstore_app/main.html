@@ -1,3 +1,5 @@
+{% extends 'bookstore_app/base.html' %}
+{% block content %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,6 +11,10 @@
         {% csrf_token %}
         <input type="submit" value="Logout">
     </form>
+    <form method="post" action="{% url 'user_profile' %}">
+        {% csrf_token %}
+        <input type="submit" value="Your profile">
+    </form>
     <ul>
         {% for book in books %}
             <li>
@@ -16,9 +22,11 @@
                 <p><strong>Author:</strong> {{ book.volumeInfo.authors|join:", " }}</p>
                 <p><strong>Published Date:</strong> {{ book.volumeInfo.publishedDate }}</p>
                 <p><strong>Description:</strong> {{ book.volumeInfo.description }}</p>
+                <p><strong>Genre:</strong> {{ book.volumeInfo.categories|join:", " }}</p>
             </li>
         {% empty %}
             <p>No books available.</p>
         {% endfor %}
     </ul>
 </body>
+{% endblock %}

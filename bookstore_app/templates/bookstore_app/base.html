@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bookstore Online{% endblock %}</title>
+    <style>
+         header {
+                    background-color: olive;
+                    color: white;
+                    text-align: center;
+                    padding: 1em 0;
+                }
+    </style>
+<body>
+    <header>
+        <h1>Bookstore Online</h1>
+    </header>
+        {% block content %}
+        {% endblock %}
+</body>
+</html>

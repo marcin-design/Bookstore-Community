@@ -57,7 +57,7 @@ def main_page(request):
     api_key = settings.GOOGLE_BOOKS_API_KEY
 
     params = {
-        "q": "Harry Potter",
+        "q": "King",
         "key": api_key,
     }
 
@@ -76,3 +76,9 @@ def main_page(request):
 def logout_view(request):
     logout(request)
     return render(request, 'bookstore_app/logout.html')
+
+
+def user_view(request):
+    return render(request,
+                  'bookstore_app/user_profile.html',
+                  {'user': request.user})
