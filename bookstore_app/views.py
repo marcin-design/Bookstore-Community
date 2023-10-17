@@ -1,15 +1,12 @@
-from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, logout, authenticate
-from django.contrib.auth.models import User
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist
 from .forms import *
 import requests
 from Bookstore_project import settings
+from datetime import datetime
 
 
 class RegistrationView(View):
@@ -23,7 +20,7 @@ class RegistrationView(View):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            return redirect('main.html')
+            return redirect('main')
         else:
             return render(request,
                           'bookstore_app/incorrect_registration.html',
@@ -53,11 +50,13 @@ class LoginView(View):
 
 @login_required
 def main_page(request):
+    #the function aims to retrieve data from the Google Books API,
+    # process it and save it in the database based on the Book model
     api_url = "https://www.googleapis.com/books/v1/volumes"
     api_key = settings.GOOGLE_BOOKS_API_KEY
 
     params = {
-        "q": "King",
+        "q": "Piekara",
         "key": api_key,
     }
 
@@ -66,12 +65,41 @@ def main_page(request):
     if response.status_code == 200:
         data = response.json()
         books = data.get("items", [])
+
+        for book_data in books:
+            book_info = book_data.get("volumeInfo", {})
+            genres = book_info.get("categories", [])
+
+            existing_book = Book.objects.filter(title=book_info.get("title", ""))
+
+            if not existing_book:
+                thumbnail = book_info.get("imageLinks", {}).get("thumbnail", "")
+
+                def convert_to_date(date_str):
+                #function that tries to convert a date from a custom format to a date object(Y-M-D)
+                    try:
+                        date = datetime.strptime(date_str, "%Y").date()
+                        return date
+                    except ValueError:
+                        return None
+
+                new_book = Book(
+                    title=book_info.get("title", ""),
+                    author=",".join(book_info.get("authors", [])),
+                    description=book_info.get("description", ""),
+                    published_date=convert_to_date(book_info.get("publishedDate")),
+                    genre=",".join(genres),
+                    user_rating=None,
+                    thumbnail=thumbnail
+                )
+
+                new_book.save()
+
     else:
         books = []
 
-    return render(request,
-                  'bookstore_app/main.html',
-                  {'books': books})
+    return render(request, 'bookstore_app/main.html', {'books': books})
+
 
 def logout_view(request):
     logout(request)
