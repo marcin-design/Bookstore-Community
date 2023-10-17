@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Bookstore Community.iml" filepath="$PROJECT_DIR$/.idea/Bookstore Community.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../GITHUB/Conf_Room/.idea/WARSZTATY.iml" filepath="$PROJECT_DIR$/../GITHUB/Conf_Room/.idea/WARSZTATY.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Zaawansowane_Django/.idea/Zaawansowane_Django.iml" filepath="$PROJECT_DIR$/../Zaawansowane_Django/.idea/Zaawansowane_Django.iml" />
     </modules>
   </component>

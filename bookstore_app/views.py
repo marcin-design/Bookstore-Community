@@ -56,7 +56,7 @@ def main_page(request):
     api_key = settings.GOOGLE_BOOKS_API_KEY
 
     params = {
-        "q": "Piekara",
+        "q": "Grace",
         "key": api_key,
     }
 
@@ -127,3 +127,11 @@ class WishlistView(View):
         return render(request,
                       'bookstore_app/wishlist.html',
                       {'form': form})
+
+
+class BookDetailsView(View):
+    def get(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        return render(request,
+                      'bookstore_app/book_details.html',
+                      {'book': book})

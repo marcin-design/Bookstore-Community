@@ -18,11 +18,8 @@
     <ul>
         {% for book in books %}
             <li>
-                <h3>{{ book.volumeInfo.title }}</h3>
+                 <h3><a href="/book_details/{{ book.id }}/">{{ book.volumeInfo.title }}</a></h3>
                 <p><strong>Author:</strong> {{ book.volumeInfo.authors|join:", " }}</p>
-                <p><strong>Published Date:</strong> {{ book.volumeInfo.publishedDate }}</p>
-                <p><strong>Description:</strong> {{ book.volumeInfo.description }}</p>
-                <p><strong>Genre:</strong> {{ book.volumeInfo.categories|join:", " }}</p>
             </li>
         {% empty %}
             <p>No books available.</p>
