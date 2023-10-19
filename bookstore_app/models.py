@@ -11,6 +11,7 @@ class Book(models.Model):
     user_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
     thumbnail = models.URLField(blank=True, null=True)
 
+
     def __str__(self):
         return self.title
 

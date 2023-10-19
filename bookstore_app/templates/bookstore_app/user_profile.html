@@ -4,29 +4,41 @@
 <html>
 <head>
     <title>Your Page</title>
+    <style>
+        form {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        #user_description {
+            margin-top: 20px;
+            display: block;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome, {{ user.first_name }}</h1>
-    <h3>Your Profile</h3>
     <form method="get" action="{% url 'main' %}">
         <input type="submit" value="Main Page">
     </form>
     <form method="get" action="{% url 'list_of_friends' %}">
         <input type="submit" value="List of friends">
     </form>
-    <form method="get" action="{% url 'wishlist' %}">
+    <form  method="get" action="{% url 'wishlist' %}">
         <input type="submit" value="Wishlist">
     </form>
     <form method="get" action="{% url 'wishlist' %}">
         <input type="submit" value="Books Read">
     </form>
-    <form method="post" action="{% url 'user_profile' %}">
+    <form id="user_description" method="post" action="{% url 'user_profile' %}">
         {% csrf_token %}
         <h3>Your description:</h3>
         <textarea name="user_description">{{ user_description }}</textarea>
         <button type="submit">Save</button>
     </form>
-    <h3>Last Saved Description:</h3>
+    <h3>Your Current Description:</h3>
     <p>{{ last_saved_description }}</p>
 </body>
 </html>
