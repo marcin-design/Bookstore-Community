@@ -20,18 +20,7 @@
 </head>
 <body>
     <h1>Welcome, {{ user.first_name }}</h1>
-    <form method="get" action="{% url 'main' %}">
-        <input type="submit" value="Main Page">
-    </form>
-    <form method="get" action="{% url 'list_of_friends' %}">
-        <input type="submit" value="List of friends">
-    </form>
-    <form  method="get" action="{% url 'wishlist' %}">
-        <input type="submit" value="Wishlist">
-    </form>
-    <form method="get" action="{% url 'wishlist' %}">
-        <input type="submit" value="Books Read">
-    </form>
+
     <form id="user_description" method="post" action="{% url 'user_profile' %}">
         {% csrf_token %}
         <h3>Your description:</h3>

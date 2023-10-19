@@ -11,11 +11,43 @@
                     text-align: center;
                     padding: 1em 0;
                 }
+        form {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        #user_description {
+            margin-top: 20px;
+            display: block;
+        }
+        h1 {
+            text-align: center;
+        }
     </style>
 <body>
     <header>
         <h1>Bookstore Online</h1>
     </header>
+    <form method="get" action="{% url 'main' %}">
+        <input type="submit" value="Main Page">
+    </form>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <input type="submit" value="Logout">
+    </form>
+    <form method="post" action="{% url 'user_profile' %}">
+        {% csrf_token %}
+        <input type="submit" value="Your profile">
+    </form>
+    </form>
+    <form method="get" action="{% url 'list_of_friends' %}">
+        <input type="submit" value="List of friends">
+    </form>
+    <form method="get" action="{% url 'wishlist' %}">
+        <input type="submit" value="Wishlist">
+    </form>
+    <form method="get" action="{% url 'wishlist' %}">
+        <input type="submit" value="Books Read">
+    </form>
         {% block content %}
         {% endblock %}
 </body>

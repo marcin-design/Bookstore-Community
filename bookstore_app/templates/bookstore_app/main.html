@@ -16,24 +16,7 @@
 </head>
 <body>
     <h1>List of Books</h1>
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <input type="submit" value="Logout">
-    </form>
-    <form method="post" action="{% url 'user_profile' %}">
-        {% csrf_token %}
-        <input type="submit" value="Your profile">
-    </form>
-    </form>
-    <form method="get" action="{% url 'list_of_friends' %}">
-        <input type="submit" value="List of friends">
-    </form>
-    <form method="get" action="{% url 'wishlist' %}">
-        <input type="submit" value="Wishlist">
-    </form>
-    <form method="get" action="{% url 'wishlist' %}">
-        <input type="submit" value="Books Read">
-    </form>
+
     <ul>
         {% for book in books %}
             <li>
