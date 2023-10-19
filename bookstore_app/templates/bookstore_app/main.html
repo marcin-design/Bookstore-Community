@@ -19,6 +19,7 @@
         {% for book in books %}
             <li>
                  <h3><a href="/book_details/{{ book.id }}/">{{ book.volumeInfo.title }}</a></h3>
+
                 <p><strong>Author:</strong> {{ book.volumeInfo.authors|join:", " }}</p>
             </li>
         {% empty %}

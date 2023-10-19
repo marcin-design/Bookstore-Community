@@ -6,5 +6,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Zaawansowane_Django" />
     <orderEntry type="module" module-name="WARSZTATY" />
+    <orderEntry type="module" module-name="SCRUM LAB" />
   </component>
 </module>

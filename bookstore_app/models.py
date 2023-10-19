@@ -23,6 +23,8 @@ class UserProfile(models.Model):
                                      on_delete=models.SET_NULL,
                                      null=True, blank=True,
                                      related_name='currently_reading')
+    user_description = models.TextField(blank=True, null=True)
+    last_saved_description = models.TextField(blank=True, null=True)
     has_access = models.BooleanField(default=True)
 
 

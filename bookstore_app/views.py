@@ -105,11 +105,41 @@ def logout_view(request):
     logout(request)
     return render(request, 'bookstore_app/logout.html')
 
-@login_required
-def user_view(request):
-    return render(request,
-                  'bookstore_app/user_profile.html',
-                  {'user': request.user})
+class UserProfileView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            user_profile = user.userprofile
+        except UserProfile.DoesNotExist:
+            user_profile = UserProfile(user=user)
+            user_profile.save()
+
+        user_description = user_profile.user_description
+        last_saved_description = user_profile.last_saved_description
+
+        return render(request,
+                      'bookstore_app/user_profile.html',
+                      {'user_description': user_description, 'last_saved_description': last_saved_description})
+
+    def post(self, request, *args, **kwargs):
+        form = UserProfileForm(request.POST)
+        if form.is_valid():
+            user_description = form.cleaned_data['user_description']
+            user = request.user
+            user_profile = user.userprofile
+            user_profile.user_description = user_description
+            user_profile.last_saved_description = user_description
+            user_profile.save()
+
+            return render(request,
+                          'bookstore_app/user_profile.html',
+                          {'user_description': user_description, 'last_saved_description': user_profile.last_saved_description})
+        else:
+            return render(request,
+                          'bookstore_app/user_profile.html',
+                          {'form': form})
+
+
 
 
 class FriendsListView(View):
@@ -135,3 +165,13 @@ class BookDetailsView(View):
         return render(request,
                       'bookstore_app/book_details.html',
                       {'book': book})
+
+
+class BooksReadView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'bookstore_app/books_read.html')
+
+
+# class AddBookToWishlistView(View):
+#     def get(self, request, *args, **kwargs):
+#         return render(request, '')
