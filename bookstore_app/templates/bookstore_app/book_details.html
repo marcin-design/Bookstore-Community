@@ -15,7 +15,11 @@
     <p>Users likes: {{ book.user_rating }}</p>
     <p>Book cover:</p>
     <img src="{{ book.thumbnail }}" alt="Book Cover"><br>
-    <button type="submit">Add to Wishlist</button><br>
+    <form method="post" action="{% url 'book_details' book.id %}">
+        {% csrf_token %}
+        {{ form.add_wishlist }}
+        <button type="submit">Add to Wishlist</button>
+    </form><br>
     <button type="submit">I like this book</button><br>
     <button type="submit">I don't like this book</button>
 </body>

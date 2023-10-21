@@ -35,6 +35,9 @@ class WishlistForm(forms.ModelForm):
 class AddFriendForm(forms.Form):
     friend_username = forms.CharField(label='Username of Friend')
 
+class AddToWishlistForm(forms.Form):
+    add_wishlist = forms.CharField(widget=forms.HiddenInput(), initial="add_wishlist")
+
 
 # class UserProfileForm(forms.ModelForm):
 #     class Meta:

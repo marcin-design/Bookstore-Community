@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist, User
-from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm
+from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, AddToWishlistForm
 import requests
 from Bookstore_project import settings
 
@@ -55,10 +55,8 @@ class LoginView(View):
 def main_page(request, book_id=None):
     if book_id:
         try:
-            # Konwertuj identyfikator książki z ciągu znaków na liczbę całkowitą
             book_id_int = int(book_id)
 
-            # Znajdź książkę w bazie danych używając nowego identyfikatora
             book = Book.objects.get(pk=book_id_int)
 
             return render(request, 'bookstore_app/book_details.html', {'book': book})
@@ -121,10 +119,23 @@ def main_page(request, book_id=None):
 class BookDetailsView(View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
-        return render(request,
-                      'bookstore_app/book_details.html',
-                      {'book': book})
+        form = AddToWishlistForm()
+        return render(request, 'bookstore_app/book_details.html', {'book': book, 'form': form})
 
+    def post(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+
+        form = AddToWishlistForm(request.POST)
+
+        if form.is_valid():
+            if 'add_wishlist' in form.cleaned_data:
+                wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+                wishlist.books.add(book)
+
+                return redirect('book_details', book_id=book_id)
+
+        return render(request, 'bookstore_app/book_details.html', {'book': book, 'form': form})
 def logout_view(request):
     logout(request)
     return render(request, 'bookstore_app/logout.html')
@@ -176,12 +187,26 @@ class FriendsListView(View):
 
 
 class WishlistView(View):
-    def get(self, request, *args, **kwargs):
-        form = WishlistForm()
-        return render(request,
-                      'bookstore_app/wishlist.html',
-                      {'form': form})
+    def get(self, request):
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
 
+        books_in_wishlist = wishlist.books.all()
+
+        form = WishlistForm()
+
+        return render(request, 'bookstore_app/wishlist.html', {'form': form, 'books_in_wishlist': books_in_wishlist})
+
+    def post(self, request):
+        form = WishlistForm(request.POST)
+
+        if form.is_valid():
+            wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+            books_to_add = form.cleaned_data.get('books')
+
+            wishlist.books.add(*books_to_add)
+
+        return redirect('wishlist')
 
 class BooksReadView(View):
     def get(self, request, *args, **kwargs):

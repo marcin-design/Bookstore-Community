@@ -8,7 +8,20 @@
 </head>
 <body>
 <h3>Wishlist</h3>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add to Wishlist</button>
+</form>
 
+<h4>Your Wishlist:</h4>
+<ul>
+    {% for book in books_in_wishlist %}
+        <li>{{ book.title }}</li>
+    {% empty %}
+        <li>Your wishlist is empty.</li>
+    {% endfor %}
+</ul>
 </body>
 </html>
 {% endblock %}
