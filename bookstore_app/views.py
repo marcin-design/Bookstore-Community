@@ -155,6 +155,8 @@ class AddFriendView(View):
                 if friend != request.user:
                     friend_profile, _ = UserProfile.objects.get_or_create(user=friend)
                     user_profile.friends.add(friend_profile)
+                else:
+                    return render(request, 'bookstore_app/user_add_self.html')
 
             except UserProfile.DoesNotExist:
                 return redirect('bookstore_app/user_does_not_exists.html')
