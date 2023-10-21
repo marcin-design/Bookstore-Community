@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <h1>Welcome, {{ user.first_name }}</h1>
+    <h1>Welcome, {{ user.first_name }} ({{ user.username }})</h1>
 
     <form id="user_description" method="post" action="{% url 'user_profile' %}">
         {% csrf_token %}
@@ -34,7 +34,3 @@
 {% endblock %}
 
 
-<!-- -Opis użytkownika -> do bazy danych-->
-<!-- -Listę przeczytanych ksiażek (nie button)-->
-<!-- -Button usunięcia konta-->
-<!-- -Button edycji konta - opisu-->

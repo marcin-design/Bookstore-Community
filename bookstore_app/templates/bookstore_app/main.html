@@ -18,14 +18,20 @@
     <h1>List of Books</h1>
 
     <ul>
-        {% for book in books %}
-            <li>
-                <h3><a href="{% url 'book_details' book.id %}">{{ book.volumeInfo.title }}</a></h3>
-                <p><strong>Author:</strong> {{ book.volumeInfo.authors|join:", " }}</p>
-            </li>
-        {% empty %}
-            <p>No books available.</p>
-        {% endfor %}
-    </ul>
+    {% for book in books %}
+        <li>
+            <h3><a href="{% url 'book_details' book.id %}">{{ book.volumeInfo.title }}</a></h3>
+            <p><strong>Author:</strong> {{ book.volumeInfo.authors|join:", " }}</p>
+            {% if book.volumeInfo.imageLinks %}
+                <img src="{{ book.volumeInfo.imageLinks.thumbnail }}" alt="Book Cover">
+            {% else %}
+                <p>No book cover available.</p>
+            {% endif %}
+        </li>
+    {% empty %}
+        <p>No books available.</p>
+    {% endfor %}
+</ul>
+
 </body>
 {% endblock %}

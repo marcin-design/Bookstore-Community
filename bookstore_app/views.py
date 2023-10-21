@@ -1,12 +1,14 @@
+from datetime import datetime
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist
-from .forms import *
+from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, UserProfileForm
 import requests
 from Bookstore_project import settings
-from datetime import datetime
+
 
 
 class RegistrationView(View):
@@ -98,7 +100,9 @@ def main_page(request):
     else:
         books = []
 
-    return render(request, 'bookstore_app/main.html', {'books': books})
+    return render(request,
+                  'bookstore_app/main.html',
+                  {'books': books})
 
 
 def logout_view(request):
@@ -107,38 +111,21 @@ def logout_view(request):
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
-        user = request.user
-        try:
-            user_profile = user.userprofile
-        except UserProfile.DoesNotExist:
-            user_profile = UserProfile(user=user)
-            user_profile.save()
-
-        user_description = user_profile.user_description
-        last_saved_description = user_profile.last_saved_description
+        user_description = request.session.get('user_description', '')  # Odczytaj opis użytkownika z sesji
 
         return render(request,
                       'bookstore_app/user_profile.html',
-                      {'user_description': user_description, 'last_saved_description': last_saved_description})
+                      {'user_description': user_description})
 
     def post(self, request, *args, **kwargs):
         form = UserProfileForm(request.POST)
         if form.is_valid():
             user_description = form.cleaned_data['user_description']
-            user = request.user
-            user_profile = user.userprofile
-            user_profile.user_description = user_description
-            user_profile.last_saved_description = user_description
-            user_profile.save()
+            request.session['user_description'] = user_description  # Zapisz opis użytkownika w sesji
 
             return render(request,
                           'bookstore_app/user_profile.html',
-                          {'user_description': user_description, 'last_saved_description': user_profile.last_saved_description})
-        else:
-            return render(request,
-                          'bookstore_app/user_profile.html',
-                          {'form': form})
-
+                          {'user_description': user_description})
 
 
 
