@@ -32,8 +32,11 @@ class WishlistForm(forms.ModelForm):
         model = Wishlist
         fields = ['books']
 
+class AddFriendForm(forms.Form):
+    friend_username = forms.CharField(label='Username of Friend')
 
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ['user_description']
+
+# class UserProfileForm(forms.ModelForm):
+#     class Meta:
+#         model = UserProfile
+#         fields = ['user_description']

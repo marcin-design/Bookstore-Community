@@ -21,16 +21,20 @@
 <body>
     <h1>Welcome, {{ user.first_name }} ({{ user.username }})</h1>
 
-    <form id="user_description" method="post" action="{% url 'user_profile' %}">
-        {% csrf_token %}
-        <h3>Your description:</h3>
-        <textarea name="user_description">{{ user_description }}</textarea>
-        <button type="submit">Save</button>
-    </form>
-    <h3>Your Current Description:</h3>
-    <p>{{ last_saved_description }}</p>
+<!--    <form id="user_description" method="post" action="{% url 'user_profile' %}">-->
+<!--        {% csrf_token %}-->
+<!--        <h3>Your description:</h3>-->
+<!--        <textarea name="user_description">{{ user_description }}</textarea>-->
+<!--        <button type="submit">Save</button>-->
+<!--    </form>-->
+<!--    <h3>Your Current Description:</h3>-->
+<!--    <p>{{ last_saved_description }}</p>-->
 </body>
 </html>
 {% endblock %}
 
 
+<!-- -Opis użytkownika -> do bazy danych-->
+<!-- -Listę przeczytanych ksiażek (nie button)-->
+<!-- -Button usunięcia konta-->
+<!-- -Button edycji konta - opisu-->

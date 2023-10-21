@@ -7,9 +7,12 @@
 </head>
 <body>
     <h1>Your Friends</h1>
+        <form method="get" action="{% url 'add_friend' %}">
+        <input type="submit" value="Add a new Friend">
+        </form>
     <ul>
         {% for friend in friends %}
-            <li>{{ friend.friend.username }}</li>
+            <li>{{ friend.user.username }}</li>
         {% empty %}
             <li>You don't have any friends yet.</li>
         {% endfor %}

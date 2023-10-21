@@ -26,11 +26,12 @@ class UserProfile(models.Model):
                                      related_name='currently_reading')
     user_description = models.TextField(blank=True, null=True)
     has_access = models.BooleanField(default=True)
-
+    friends = models.ManyToManyField('self', through='Friendship', symmetrical=False)
 
 class Friendship(models.Model):
-    user = models.ForeignKey(User, related_name='friends', on_delete=models.CASCADE)
-    friend = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user_friendships')
+    friend = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return f"{self.user} - {self.friend}"

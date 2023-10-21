@@ -1,11 +1,12 @@
 from datetime import datetime
 
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
-from .models import Book, UserProfile, Friendship, Review, Wishlist
-from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, UserProfileForm
+from .models import Book, UserProfile, Friendship, Review, Wishlist, User
+from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm
 import requests
 from Bookstore_project import settings
 
@@ -51,59 +52,78 @@ class LoginView(View):
 
 
 @login_required
-def main_page(request):
-    #the function aims to retrieve data from the Google Books API,
-    # process it and save it in the database based on the Book model
-    api_url = "https://www.googleapis.com/books/v1/volumes"
-    api_key = settings.GOOGLE_BOOKS_API_KEY
+def main_page(request, book_id=None):
+    if book_id:
+        try:
+            # Konwertuj identyfikator książki z ciągu znaków na liczbę całkowitą
+            book_id_int = int(book_id)
 
-    params = {
-        "q": "Grace",
-        "key": api_key,
-    }
+            # Znajdź książkę w bazie danych używając nowego identyfikatora
+            book = Book.objects.get(pk=book_id_int)
 
-    response = requests.get(api_url, params=params)
-
-    if response.status_code == 200:
-        data = response.json()
-        books = data.get("items", [])
-
-        for book_data in books:
-            book_info = book_data.get("volumeInfo", {})
-            genres = book_info.get("categories", [])
-
-            existing_book = Book.objects.filter(title=book_info.get("title", ""))
-
-            if not existing_book:
-                thumbnail = book_info.get("imageLinks", {}).get("thumbnail", "")
-
-                def convert_to_date(date_str):
-                #function that tries to convert a date from a custom format to a date object(Y-M-D)
-                    try:
-                        date = datetime.strptime(date_str, "%Y").date()
-                        return date
-                    except ValueError:
-                        return None
-
-                new_book = Book(
-                    title=book_info.get("title", ""),
-                    author=",".join(book_info.get("authors", [])),
-                    description=book_info.get("description", ""),
-                    published_date=convert_to_date(book_info.get("publishedDate")),
-                    genre=",".join(genres),
-                    user_rating=None,
-                    thumbnail=thumbnail
-                )
-
-                new_book.save()
-
+            return render(request, 'bookstore_app/book_details.html', {'book': book})
+        except (ValueError, Book.DoesNotExist):
+            raise Http404("Book does not exist")
     else:
-        books = []
+        #the function aims to retrieve data from the Google Books API,
+        # process it and save it in the database based on the Book model
+        api_url = "https://www.googleapis.com/books/v1/volumes"
+        api_key = settings.GOOGLE_BOOKS_API_KEY
 
-    return render(request,
-                  'bookstore_app/main.html',
-                  {'books': books})
+        params = {
+            "q": "Grace",
+            "key": api_key,
+        }
 
+        response = requests.get(api_url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            books = data.get("items", [])
+
+            for book_data in books:
+                book_info = book_data.get("volumeInfo", {})
+                genres = book_info.get("categories", [])
+
+                existing_book = Book.objects.filter(title=book_info.get("title", ""))
+
+                if not existing_book:
+                    thumbnail = book_info.get("imageLinks", {}).get("thumbnail", "")
+
+                    def convert_to_date(date_str):
+                    #function that tries to convert a date from a custom format to a date object(Y-M-D)
+                        try:
+                            date = datetime.strptime(date_str, "%Y").date()
+                            return date
+                        except ValueError:
+                            return None
+
+                    new_book = Book(
+                        title=book_info.get("title", ""),
+                        author=",".join(book_info.get("authors", [])),
+                        description=book_info.get("description", ""),
+                        published_date=convert_to_date(book_info.get("publishedDate")),
+                        genre=",".join(genres),
+                        user_rating=None,
+                        thumbnail=thumbnail
+                    )
+
+                    new_book.save()
+
+        else:
+            books = []
+
+        return render(request,
+                      'bookstore_app/main.html',
+                      {'books': books})
+
+
+class BookDetailsView(View):
+    def get(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        return render(request,
+                      'bookstore_app/book_details.html',
+                      {'book': book})
 
 def logout_view(request):
     logout(request)
@@ -111,31 +131,46 @@ def logout_view(request):
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
-        user_description = request.session.get('user_description', '')  # Odczytaj opis użytkownika z sesji
-
         return render(request,
-                      'bookstore_app/user_profile.html',
-                      {'user_description': user_description})
+                      'bookstore_app/user_profile.html')
+
 
     def post(self, request, *args, **kwargs):
-        form = UserProfileForm(request.POST)
+        return redirect('user_profile')
+
+class AddFriendView(View):
+    def get(self, request):
+        form = AddFriendForm()
+        return render(request, 'bookstore_app/add_friend.html', {'form': form})
+
+    def post(self, request):
+        form = AddFriendForm(request.POST)
         if form.is_valid():
-            user_description = form.cleaned_data['user_description']
-            request.session['user_description'] = user_description  # Zapisz opis użytkownika w sesji
+            friend_username = form.cleaned_data['friend_username']
+            user_profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-            return render(request,
-                          'bookstore_app/user_profile.html',
-                          {'user_description': user_description})
+            try:
+                friend = User.objects.get(username=friend_username)
 
+                if friend != request.user:
+                    friend_profile, _ = UserProfile.objects.get_or_create(user=friend)
+                    user_profile.friends.add(friend_profile)
+
+            except UserProfile.DoesNotExist:
+                return redirect('bookstore_app/user_does_not_exists.html')
+
+        return HttpResponseRedirect(request.path_info)
 
 
 class FriendsListView(View):
     def get(self, request, *args, **kwargs):
-        user = request.user
-        friends = Friendship.objects.filter(user=user)
+        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        friends = user_profile.friends.all()
         return render(request,
                       'bookstore_app/friends_list.html',
                       {'friends': friends})
+
+
 
 
 class WishlistView(View):
@@ -146,19 +181,6 @@ class WishlistView(View):
                       {'form': form})
 
 
-class BookDetailsView(View):
-    def get(self, request, book_id):
-        book = Book.objects.get(pk=book_id)
-        return render(request,
-                      'bookstore_app/book_details.html',
-                      {'book': book})
-
-
 class BooksReadView(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'bookstore_app/books_read.html')
-
-
-# class AddBookToWishlistView(View):
-#     def get(self, request, *args, **kwargs):
-#         return render(request, '')
