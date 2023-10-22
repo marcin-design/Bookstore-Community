@@ -222,4 +222,21 @@ class WishlistView(View):
 
 class BooksReadView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'bookstore_app/books_read.html')
+        books_read, created = UserProfile.objects.get_or_create(user=request.user)
+        books_in_list = books_read.books_read_list.all()
+        form = UserBooksForm()
+        return render(request,
+                      'bookstore_app/books_read.html',
+                      {'form': form,
+                       'books_in_list': books_in_list})
+
+    def post(self, request, *args, **kwargs):
+        form = UserBooksForm(request.POST)
+        if form.is_valid():
+            books_read, created = UserProfile.objects.get_or_create(user=request.user)
+            books_to_add = form.cleaned_data.get('currently_reading_book')
+            if books_to_add:
+                books_read.books_read_list.add(books_to_add)
+        return redirect('read_books')
+
+

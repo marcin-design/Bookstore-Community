@@ -7,8 +7,21 @@
     <title>Books Read</title>
 </head>
 <body>
-<h3>Books Read</h3>
+<h1>Books Read</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add to Books Read list</button>
+</form>
 
+<h4>Your Books Read list:</h4>
+<ul>
+    {% for book in books_in_list %}
+        <li>{{ book.title }}</li>
+    {% empty %}
+        <li>Your list is empty.</li>
+    {% endfor %}
+</ul>
 </body>
 </html>
 {% endblock %}

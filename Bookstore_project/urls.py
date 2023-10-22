@@ -13,4 +13,5 @@ urlpatterns = [
     path('friends_list/', bk_views.FriendsListView.as_view(), name='list_of_friends'),
     path('wishlist/', bk_views.WishlistView.as_view(), name='wishlist'),
     path('book_details/<str:book_id>/', bk_views.BookDetailsView.as_view(), name='book_details'),
+    path('read_books/', bk_views.BooksReadView.as_view(), name='read_books'),
 ]
