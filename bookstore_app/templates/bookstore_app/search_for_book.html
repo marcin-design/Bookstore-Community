@@ -1,0 +1,17 @@
+{% extends 'bookstore_app/base.html' %}
+{% block content %}
+<h2>Search Results</h2>
+{% if books %}
+    <ul>
+        {% for book in books %}
+            <li>
+                <h3>{{ book.title }}</h3>
+                <p>Author: {{ book.author }}</p>
+                <p>Genre: {{ book.genre }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No rooms match your search criteria.</p>
+{% endif %}
+{% endblock %}

@@ -22,11 +22,22 @@
         h1 {
             text-align: center;
         }
+        footer {
+            text-align: center;
+            padding: 1em 0;
+            background-color: #f2f2f2;
+        }
     </style>
 <body>
     <header>
         <h1>Bookstore Online</h1>
     </header>
+     <form action="{% url 'query' %}" method="GET">
+    <input type="text" name="title" placeholder="Search by title">
+    <input type="text" name="author" placeholder="Search by author">
+    <input type="text" name="genre" placeholder="Search by genre">
+    <button type="submit">Search</button>
+        </form><br>
     <form method="get" action="{% url 'main' %}">
         <input type="submit" value="Main Page">
     </form>
@@ -37,7 +48,6 @@
     <form method="get" action="{% url 'user_profile' %}">
         {% csrf_token %}
         <input type="submit" value="Your profile">
-    </form>
     </form>
     <form method="get" action="{% url 'list_of_friends' %}">
         <input type="submit" value="List of friends">
@@ -50,5 +60,8 @@
     </form>
         {% block content %}
         {% endblock %}
+    <footer>
+        <p>Author of the project: Marcin Krysiak</p>
+    </footer>
 </body>
 </html>

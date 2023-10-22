@@ -19,10 +19,10 @@
     <ul>
     {% for book in books %}
         <li>
-            <h3><a href="{% url 'book_details' book.id %}">{{ book.volumeInfo.title }}</a></h3>
-            <p><strong>Author:</strong> {{ book.volumeInfo.authors|join:", " }}</p>
-            {% if book.volumeInfo.imageLinks %}
-                <img src="{{ book.volumeInfo.imageLinks.thumbnail }}" alt="Book Cover">
+            <h3><a href="{% url 'book_details' book.id %}">{{ book.title }}</a></h3>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            {% if book.thumbnail %}
+                <img src="{{ book.thumbnail }}" alt="Book Cover">
             {% else %}
                 <p>No book cover available.</p>
             {% endif %}

@@ -69,21 +69,27 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Grace",
+            "q": "Marvel",
             "key": api_key,
         }
 
         response = requests.get(api_url, params=params)
 
         if response.status_code == 200:
+            books = []
             data = response.json()
-            books = data.get("items", [])
+            google_books = data.get("items", [])
 
-            for book_data in books:
+            for book_data in google_books:
                 book_info = book_data.get("volumeInfo", {})
                 genres = book_info.get("categories", [])
 
                 existing_book = Book.objects.filter(title=book_info.get("title", ""))
+
+                for book in existing_book:
+                    books.append(book)
+
+
 
                 if not existing_book:
                     thumbnail = book_info.get("imageLinks", {}).get("thumbnail", "")
@@ -107,6 +113,7 @@ def main_page(request, book_id=None):
                     )
 
                     new_book.save()
+                    books.append(new_book)
 
         else:
             books = []
@@ -238,5 +245,23 @@ class BooksReadView(View):
             if books_to_add:
                 books_read.books_read_list.add(books_to_add)
         return redirect('read_books')
+
+
+def search_for_book(request):
+    query_title = request.GET.get('title')
+    query_author = request.GET.get('author')
+    query_genre = request.GET.get('genre')
+
+    books = Book.objects.all()
+    if query_title:
+        books = books.filter(title__icontains=query_title)
+    if query_author:
+        books = books.filter(author__icontains=query_author)
+    if query_genre:
+        books = books.filter(genre__icontains=query_genre)
+
+    return render(request,
+                  'bookstore_app/search_for_book.html',
+                  {'books': books})
 
 
