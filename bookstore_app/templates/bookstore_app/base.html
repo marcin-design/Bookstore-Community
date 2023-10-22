@@ -34,7 +34,7 @@
         {% csrf_token %}
         <input type="submit" value="Logout">
     </form>
-    <form method="post" action="{% url 'user_profile' %}">
+    <form method="get" action="{% url 'user_profile' %}">
         {% csrf_token %}
         <input type="submit" value="Your profile">
     </form>

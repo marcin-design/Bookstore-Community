@@ -20,7 +20,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     books_read_list = models.ManyToManyField(Book, related_name='read_by_user')
-    current_book = models.ForeignKey(Book,
+    currently_reading_book = models.ForeignKey(Book,
                                      on_delete=models.SET_NULL,
                                      null=True, blank=True,
                                      related_name='currently_reading')
@@ -53,3 +53,4 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"Wishlist created by user {self.user}"
+

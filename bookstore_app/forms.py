@@ -39,6 +39,16 @@ class AddToWishlistForm(forms.Form):
     add_wishlist = forms.CharField(widget=forms.HiddenInput(), initial="add_wishlist")
 
 
+class UserBooksForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['books_read_list']
+
+class CurrentlyReadingForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['currently_reading_book']
+
 # class UserProfileForm(forms.ModelForm):
 #     class Meta:
 #         model = UserProfile

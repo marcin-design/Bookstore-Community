@@ -10,6 +10,7 @@
         <form method="get" action="{% url 'add_friend' %}">
         <input type="submit" value="Add a new Friend">
         </form>
+
     <ul>
         {% for friend in friends %}
             <li>{{ friend.user.username }}</li>

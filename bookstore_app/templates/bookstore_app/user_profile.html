@@ -21,14 +21,19 @@
 <body>
     <h1>Welcome, {{ user.first_name }} ({{ user.username }})</h1>
 
-<!--    <form id="user_description" method="post" action="{% url 'user_profile' %}">-->
-<!--        {% csrf_token %}-->
-<!--        <h3>Your description:</h3>-->
-<!--        <textarea name="user_description">{{ user_description }}</textarea>-->
-<!--        <button type="submit">Save</button>-->
-<!--    </form>-->
-<!--    <h3>Your Current Description:</h3>-->
-<!--    <p>{{ last_saved_description }}</p>-->
+<form method="post">
+    {% csrf_token %}
+    {{ currently_reading_form.as_p }}
+    <button type="submit">Save</button>
+</form>
+    <h4>Your Currently Reading Book:</h4>
+<ul>
+    {% if user_profile.currently_reading_book %}
+        {{ user_profile.currently_reading_book.title }}
+    {% else %}
+        Not currently reading any book.
+    {% endif %}
+</ul>
 </body>
 </html>
 {% endblock %}

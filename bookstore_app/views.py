@@ -6,7 +6,8 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist, User
-from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, AddToWishlistForm
+from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, AddToWishlistForm, \
+    UserBooksForm, CurrentlyReadingForm
 import requests
 from Bookstore_project import settings
 
@@ -56,7 +57,6 @@ def main_page(request, book_id=None):
     if book_id:
         try:
             book_id_int = int(book_id)
-
             book = Book.objects.get(pk=book_id_int)
 
             return render(request, 'bookstore_app/book_details.html', {'book': book})
@@ -142,12 +142,32 @@ def logout_view(request):
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
-        return render(request,
-                      'bookstore_app/user_profile.html')
+        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        currently_reading_form = CurrentlyReadingForm(instance=user_profile)
 
+        if user_profile.currently_reading_book:
+            currently_reading_book_id = user_profile.currently_reading_book.id
+        else:
+            currently_reading_book_id = None
+
+        request.session['currently_reading_book_id'] = currently_reading_book_id
+
+        return render(request, 'bookstore_app/user_profile.html', {
+            'currently_reading_form': currently_reading_form,
+            'user_profile': user_profile,
+        })
 
     def post(self, request, *args, **kwargs):
+        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+        if request.method == 'POST':
+            currently_reading_form = CurrentlyReadingForm(request.POST, instance=user_profile)
+            if currently_reading_form.is_valid():
+                currently_reading_form.save()
+                request.session['currently_reading_book_id'] = user_profile.currently_reading_book.id
+
         return redirect('user_profile')
+
 
 class AddFriendView(View):
     def get(self, request):
@@ -159,7 +179,6 @@ class AddFriendView(View):
         if form.is_valid():
             friend_username = form.cleaned_data['friend_username']
             user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-
             try:
                 friend = User.objects.get(username=friend_username)
 
@@ -184,28 +203,21 @@ class FriendsListView(View):
                       {'friends': friends})
 
 
-
-
 class WishlistView(View):
     def get(self, request):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-
         books_in_wishlist = wishlist.books.all()
-
         form = WishlistForm()
-
-        return render(request, 'bookstore_app/wishlist.html', {'form': form, 'books_in_wishlist': books_in_wishlist})
+        return render(request,
+                      'bookstore_app/wishlist.html',
+                      {'form': form, 'books_in_wishlist': books_in_wishlist})
 
     def post(self, request):
         form = WishlistForm(request.POST)
-
         if form.is_valid():
             wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-
             books_to_add = form.cleaned_data.get('books')
-
             wishlist.books.add(*books_to_add)
-
         return redirect('wishlist')
 
 class BooksReadView(View):
