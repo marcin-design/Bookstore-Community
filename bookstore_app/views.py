@@ -6,8 +6,7 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist, User
-from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, AddToWishlistForm, \
-    UserBooksForm, CurrentlyReadingForm
+from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, AddToWishlistForm, UserBooksForm, CurrentlyReadingForm
 import requests
 from Bookstore_project import settings
 
@@ -69,7 +68,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Marvel",
+            "q": "Comics",
             "key": api_key,
         }
 
@@ -131,18 +130,17 @@ class BookDetailsView(View):
 
     def post(self, request, book_id):
         book = Book.objects.get(pk=book_id)
-
         form = AddToWishlistForm(request.POST)
 
         if form.is_valid():
             if 'add_wishlist' in form.cleaned_data:
                 wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-
                 wishlist.books.add(book)
-
                 return redirect('book_details', book_id=book_id)
-
         return render(request, 'bookstore_app/book_details.html', {'book': book, 'form': form})
+def logout_view(request):
+    logout(request)
+    return render(request, 'bookstore_app/logout.html')
 def logout_view(request):
     logout(request)
     return render(request, 'bookstore_app/logout.html')
@@ -241,10 +239,13 @@ class BooksReadView(View):
         form = UserBooksForm(request.POST)
         if form.is_valid():
             books_read, created = UserProfile.objects.get_or_create(user=request.user)
-            books_to_add = form.cleaned_data.get('currently_reading_book')
+            books_to_add = form.cleaned_data.get('books_read_list')
             if books_to_add:
-                books_read.books_read_list.add(books_to_add)
-        return redirect('read_books')
+                books_read.books_read_list.add(*books_to_add)
+            return redirect('read_books')
+        return render(request,
+                      'bookstore_app/books_read.html',
+                      {'form': form, 'books_in_list': books_in_list})
 
 
 def search_for_book(request):

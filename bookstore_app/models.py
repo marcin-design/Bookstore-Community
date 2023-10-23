@@ -53,4 +53,3 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"Wishlist created by user {self.user}"
-

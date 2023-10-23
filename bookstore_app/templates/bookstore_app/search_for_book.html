@@ -8,6 +8,8 @@
                 <h3>{{ book.title }}</h3>
                 <p>Author: {{ book.author }}</p>
                 <p>Genre: {{ book.genre }}</p>
+                <p>Book cover:</p>
+                    <img src="{{ book.thumbnail }}" alt="Book Cover"><br>
             </li>
         {% endfor %}
     </ul>
