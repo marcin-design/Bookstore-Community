@@ -6,7 +6,8 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist, User
-from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, AddToWishlistForm, UserBooksForm, CurrentlyReadingForm
+from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, UserBooksForm, \
+    CurrentlyReadingForm, UserRatingForm
 import requests
 from Bookstore_project import settings
 
@@ -68,7 +69,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Comics",
+            "q": "Hero",
             "key": api_key,
         }
 
@@ -125,25 +126,33 @@ def main_page(request, book_id=None):
 class BookDetailsView(View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
-        form = AddToWishlistForm()
-        return render(request, 'bookstore_app/book_details.html', {'book': book, 'form': form})
+        form = UserRatingForm()
+        return render(request,
+                      'bookstore_app/book_details.html',
+                      {'book': book, 'form': form})
 
     def post(self, request, book_id):
         book = Book.objects.get(pk=book_id)
-        form = AddToWishlistForm(request.POST)
-
+        form = UserRatingForm(request.POST)
         if form.is_valid():
-            if 'add_wishlist' in form.cleaned_data:
+            action = request.POST.get('action')
+            if action == 'Add to Wishlist':
                 wishlist, created = Wishlist.objects.get_or_create(user=request.user)
                 wishlist.books.add(book)
-                return redirect('book_details', book_id=book_id)
-        return render(request, 'bookstore_app/book_details.html', {'book': book, 'form': form})
+            elif action == 'Like':
+                book.likes += 1
+            elif action == 'Dislike':
+                book.dislikes += 1
+            book.save()
+        return render(request,
+                      'bookstore_app/book_details.html',
+                      {'book': book, 'form': form})
+
+
 def logout_view(request):
     logout(request)
     return render(request, 'bookstore_app/logout.html')
-def logout_view(request):
-    logout(request)
-    return render(request, 'bookstore_app/logout.html')
+
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
@@ -264,5 +273,4 @@ def search_for_book(request):
     return render(request,
                   'bookstore_app/search_for_book.html',
                   {'books': books})
-
 

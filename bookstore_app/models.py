@@ -9,6 +9,8 @@ class Book(models.Model):
     published_date = models.CharField(max_length=10, null=True, blank=True)
     genre = models.CharField(max_length=50)
     user_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
+    likes = models.PositiveIntegerField(default=0)
+    dislikes = models.PositiveIntegerField(default=0)
     thumbnail = models.URLField(blank=True, null=True)
 
 

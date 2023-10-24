@@ -12,16 +12,19 @@
     <p>Description: {{ book.description }}</p>
     <p>Published date: {{ book.published_date }}</p>
     <p>Genre: {{ book.genre }}</p>
-    <p>Users likes: {{ book.user_rating }}</p>
+    <p>Users likes: {{ book.likes }}</p>
+    <p>Users dislikes: {{ book.dislikes }}</p>
     <p>Book cover:</p>
     <img src="{{ book.thumbnail }}" alt="Book Cover"><br>
     <form method="post" action="{% url 'book_details' book.id %}">
         {% csrf_token %}
+        {{ form.like }}
+        {{ form.dislike }}
         {{ form.add_wishlist }}
-        <button type="submit">Add to Wishlist</button>
-    </form><br>
-    <button type="submit">I like this book</button><br>
-    <button type="submit">I don't like this book</button>
+        <input type="submit" name="action" value="Add to Wishlist"><br>
+        <input type="submit" name="action" value="Like"><br>
+        <input type="submit" name="action" value="Dislike">
+</form>
 </body>
 </html>
 {% endblock %}
