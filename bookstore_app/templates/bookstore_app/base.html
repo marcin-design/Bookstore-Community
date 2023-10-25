@@ -41,10 +41,6 @@
     <form method="get" action="{% url 'main' %}">
         <input type="submit" value="Main Page">
     </form>
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <input type="submit" value="Logout">
-    </form>
     <form method="get" action="{% url 'user_profile' %}">
         {% csrf_token %}
         <input type="submit" value="Your profile">
@@ -57,6 +53,13 @@
     </form>
     <form method="get" action="{% url 'read_books' %}">
         <input type="submit" value="Books Read">
+    </form>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <input type="submit" value="Logout">
+    </form>
+    <form method="get" action="{% url 'registration' %}">
+        <input type="submit" value="Create a New Account">
     </form>
         {% block content %}
         {% endblock %}
