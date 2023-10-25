@@ -35,10 +35,6 @@ class WishlistForm(forms.ModelForm):
 class AddFriendForm(forms.Form):
     friend_username = forms.CharField(label='Username of Friend')
 
-# class AddToWishlistForm(forms.Form):
-#     add_wishlist = forms.CharField(widget=forms.HiddenInput(), initial="add_wishlist")
-
-
 class UserRatingForm(forms.Form):
     like = forms.CharField(required=False, widget=forms.HiddenInput(), initial="like")
     dislike = forms.CharField(required=False, widget=forms.HiddenInput(), initial="dislike")
@@ -55,4 +51,3 @@ class CurrentlyReadingForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['currently_reading_book']
-

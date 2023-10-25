@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
-from .models import Book, UserProfile, Friendship, Review, Wishlist, User
+from .models import Book, UserProfile, Friendship, Review, Wishlist, User, Notification
 from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, UserBooksForm, \
     CurrentlyReadingForm, UserRatingForm
 import requests
@@ -69,7 +69,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Hero",
+            "q": "Doctor",
             "key": api_key,
         }
 
@@ -169,6 +169,12 @@ def logout_view(request):
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
+        # Handle Wishlist
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        books_in_wishlist = wishlist.books.all()
+        wishlist_form = WishlistForm()
+
+        # Handle UserProfile
         user_profile, created = UserProfile.objects.get_or_create(user=request.user)
         currently_reading_form = CurrentlyReadingForm(instance=user_profile)
 
@@ -176,17 +182,24 @@ class UserProfileView(View):
             currently_reading_book_id = user_profile.currently_reading_book.id
         else:
             currently_reading_book_id = None
-
         request.session['currently_reading_book_id'] = currently_reading_book_id
-
         return render(request, 'bookstore_app/user_profile.html', {
+            'wishlist_form': wishlist_form,
+            'books_in_wishlist': books_in_wishlist,
             'currently_reading_form': currently_reading_form,
             'user_profile': user_profile,
         })
 
     def post(self, request, *args, **kwargs):
-        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        # Handle Wishlist
+        wishlist_form = WishlistForm(request.POST)
+        if wishlist_form.is_valid():
+            wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+            books_to_add = wishlist_form.cleaned_data.get('books')
+            wishlist.books.add(*books_to_add)
 
+        # Handle UserProfile
+        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
         if request.method == 'POST':
             currently_reading_form = CurrentlyReadingForm(request.POST, instance=user_profile)
             if currently_reading_form.is_valid():
@@ -287,3 +300,34 @@ def search_for_book(request):
                   'bookstore_app/search_for_book.html',
                   {'books': books})
 
+
+# class LikeDislikeView(View):
+#     def post(self, request, book_id):
+#         book = get_object_or_404(Book, pk=book_id)
+#         action = request.POST.get('action')
+#
+#
+#         if action not in ('like', 'dislike'):
+#             return HttpResponse(status=400)  # Bad request
+#
+#         friend_ids = request.user.friends.all().values_list('id', flat=True)
+#         users_in_wishlist = book.wishlist_set.filter(user__in=friend_ids).values_list('user', flat=True)
+#
+#         for user_id in users_in_wishlist:
+#             recipient = User.objects.get(pk=user_id)
+#
+#             notification = Notification(sender=request.user, recipient=recipient, book=book,
+#                                         message=f"The user {request.user.username} gave a {action} to book {book.title}")
+#             notification.save()
+#
+#         return redirect('book_details', book_id=book_id)
+class NotificationsView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+        else:
+            notifications = []
+
+        return render(request,
+                      'bookstore_app/notifications.html',
+                      {'notifications': notifications})

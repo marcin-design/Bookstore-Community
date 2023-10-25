@@ -55,3 +55,11 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"Wishlist created by user {self.user}"
+
+class Notification(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_notifications')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_notifications')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)

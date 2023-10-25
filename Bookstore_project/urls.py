@@ -15,4 +15,5 @@ urlpatterns = [
     path('book_details/<book_id>/', bk_views.BookDetailsView.as_view(), name='book_details'),
     path('read_books/', bk_views.BooksReadView.as_view(), name='read_books'),
     path('search_book/', bk_views.search_for_book, name='query'),
+    path('notifications/', bk_views.NotificationsView.as_view(), name='notifications'),
 ]
