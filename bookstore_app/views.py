@@ -134,20 +134,33 @@ class BookDetailsView(View):
     def post(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         form = UserRatingForm(request.POST)
+
         if form.is_valid():
             action = request.POST.get('action')
+
             if action == 'Add to Wishlist':
                 wishlist, created = Wishlist.objects.get_or_create(user=request.user)
                 wishlist.books.add(book)
-            elif action == 'Like':
+
+            # Check if the user has already rated the book
+            user_has_rated = request.session.get(f'user_rated_{book.id}', False)
+
+            if user_has_rated:
+                # User has already rated, do not allow multiple ratings
+                return redirect('book_details', book_id=book.id)
+
+            if action == 'Like':
                 book.likes += 1
+                request.session[f'user_rated_{book.id}'] = True
             elif action == 'Dislike':
                 book.dislikes += 1
+                request.session[f'user_rated_{book.id}'] = True
+
             book.save()
+
         return render(request,
                       'bookstore_app/book_details.html',
                       {'book': book, 'form': form})
-
 
 def logout_view(request):
     logout(request)

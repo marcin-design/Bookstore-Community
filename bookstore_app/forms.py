@@ -43,6 +43,7 @@ class UserRatingForm(forms.Form):
     like = forms.CharField(required=False, widget=forms.HiddenInput(), initial="like")
     dislike = forms.CharField(required=False, widget=forms.HiddenInput(), initial="dislike")
     add_wishlist = forms.CharField(widget=forms.HiddenInput(), initial="add_wishlist")
+    user_has_rated = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
 
 class UserBooksForm(forms.ModelForm):
     class Meta:
