@@ -70,7 +70,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Stan",
+            "q": "Throne",
             "key": api_key,
         }
 
@@ -136,35 +136,74 @@ class BookDetailsView(View):
                       {'book': book, 'form': form})
 
     def post(self, request, book_id):
-        book = Book.objects.get(pk=book_id)
+        book = get_object_or_404(Book, pk=book_id)
+        action = request.POST.get('action')
         form = UserRatingForm(request.POST)
 
         if form.is_valid():
             action = request.POST.get('action')
 
-            if action == 'Add to Wishlist':
-                wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-                wishlist.books.add(book)
-
-            # Check if the user has already rated the book
-            user_has_rated = request.session.get(f'user_rated_{book.id}', False)
-
-            if user_has_rated:
-                # User has already rated, do not allow multiple ratings
-                return redirect('book_details', book_id=book.id)
-
             if action == 'Like':
-                book.likes += 1
-                request.session[f'user_rated_{book.id}'] = True
-            elif action == 'Dislike':
-                book.dislikes += 1
-                request.session[f'user_rated_{book.id}'] = True
+                if request.user not in book.liked_users.all():
+                    if request.user not in book.disliked_users.all():
+                        users_who_liked = book.liked_users.all()
+                        for user in users_who_liked:
+                            if user != request.user:
+                                notification = Notification(
+                                    recipient=user,
+                                    sender=request.user,
+                                    book=book,
+                                    message=f"The user {request.user.username} gave a like to book: {book.title}"
+                                )
+                                notification.save()
+                        book.likes += 1
+                        book.liked_users.add(request.user)
+                        book.save()
 
-            book.save()
+            elif action == "Dislike":
+                if request.user not in book.disliked_users.all():
+                    if request.user not in book.liked_users.all():
+                        users_who_disliked = book.disliked_users.all()
+                        for user in users_who_disliked:
+                            if user != request.user:
+                                notification = Notification(
+                                    recipient=user,
+                                    sender=request.user,
+                                    book=book,
+                                    message=f"The user {request.user.username} gave a dislike to book: {book.title}"
+                                )
+                                notification.save()
+                        book.dislikes += 1
+                        book.disliked_users.add(request.user)
+                        book.save()
+            elif action == "Add to Wishlist":
+                wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+                if book not in wishlist.books.all():
+                    wishlist.books.add(book)
 
-        return render(request,
-                      'bookstore_app/book_details.html',
-                      {'book': book, 'form': form})
+                    users_who_added_to_wishlist = book.wishlisted_users.all()
+                    for user in users_who_added_to_wishlist:
+                        if user != request.user:
+                            notification = Notification(
+                                recipient=user,
+                                sender=request.user,
+                                message=f"The user {request.user.username} added a book: {book.title} to wishlist",
+                            )
+                            notification.save()
+
+                    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+                    if book not in wishlist.books.all():
+                        wishlist.books.add(book)
+
+            return render(request,
+                          'bookstore_app/book_details.html',
+                          {'book': book, 'form': form})
+        else:
+            return redirect('invalid_form')
+
+class InvalidFormView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "bookstore_app/invalid_form.html")
 
 def logout_view(request):
     logout(request)
@@ -307,35 +346,3 @@ def search_for_book(request):
                   {'books': books})
 
 
-class LikeDislikeView(View):
-    def post(self, request, book_id):
-        book = get_object_or_404(Book, pk=book_id)
-        action = request.POST.get('action')
-
-
-        if action not in ('like', 'dislike'):
-            return HttpResponse(status=400)  # Bad request
-
-        friend_ids = request.user.friends.all().values_list('id', flat=True)
-        users_in_wishlist = book.user_wishlist.filter(user__in=friend_ids).values_list('user', flat=True)
-
-        breakpoint()
-        for user_id in users_in_wishlist:
-            recipient = User.objects.get(pk=user_id)
-
-            notification = Notification(sender=request.user,
-                                        recipient=recipient,
-                                        book=book,
-                                        message=f"The user {request.user.username} gave a {action} to book {book.title}")
-            notification.save()
-        return redirect('book_details', book_id=book_id)
-class NotificationsView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
-        else:
-            notifications = []
-
-        return render(request,
-                      'bookstore_app/notifications.html',
-                      {'notifications': notifications})

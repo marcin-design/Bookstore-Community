@@ -54,9 +54,7 @@
     <form method="get" action="{% url 'read_books' %}">
         <input type="submit" value="Books Read">
     </form>
-    <form method="get" action="{% url 'notifications' %}">
-        <input type="submit" value="Notifications">
-    </form>
+
     <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
         <input type="submit" value="Logout">

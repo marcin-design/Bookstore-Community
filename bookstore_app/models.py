@@ -12,6 +12,9 @@ class Book(models.Model):
     likes = models.PositiveIntegerField(default=0)
     dislikes = models.PositiveIntegerField(default=0)
     thumbnail = models.URLField(blank=True, null=True)
+    liked_users = models.ManyToManyField(User, related_name='liked_books')
+    disliked_users = models.ManyToManyField(User, related_name='disliked_books')
+    wishlisted_users = models.ManyToManyField(User, related_name='wishlisted_books')
 
 
     def __str__(self):
