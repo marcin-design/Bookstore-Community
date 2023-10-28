@@ -70,7 +70,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Throne",
+            "q": "White",
             "key": api_key,
         }
 
@@ -212,6 +212,8 @@ def logout_view(request):
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
+        #Handle notifications
+        user_notifications = Notification.objects.filter(recipient=request.user)
         # Handle Wishlist
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         books_in_wishlist = wishlist.books.all()
@@ -231,8 +233,8 @@ class UserProfileView(View):
             'books_in_wishlist': books_in_wishlist,
             'currently_reading_form': currently_reading_form,
             'user_profile': user_profile,
+            'notifications': user_notifications,
         })
-
     def post(self, request, *args, **kwargs):
         # Handle Wishlist
         wishlist_form = WishlistForm(request.POST)

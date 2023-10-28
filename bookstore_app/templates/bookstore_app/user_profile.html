@@ -22,14 +22,16 @@
     <h1>Welcome, {{ user.first_name }} ({{ user.username }})</h1>
 <ul>
     {% for notification in notifications %}
-      <li{% if not notification.is_read %} class="unread"{% endif %}>
+    <li {% if not notification.is_read %} class="unread"{% endif %}>
         {{ notification.message }}
         <small>{{ notification.created_at }}</small>
-      </li>
+    </li>
     {% empty %}
-      <li>No notifications.</li>
+    <li>No notifications.</li>
     {% endfor %}
-  </ul>
+</ul>
+
+
 <form method="post">
     {% csrf_token %}
     {{ currently_reading_form.as_p }}
