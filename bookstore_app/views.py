@@ -10,6 +10,7 @@ from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, A
     CurrentlyReadingForm, UserRatingForm
 import requests
 from Bookstore_project import settings
+from django.utils.dateparse import parse_date
 
 
 
@@ -69,7 +70,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Doctor",
+            "q": "Stan",
             "key": api_key,
         }
 
@@ -94,12 +95,15 @@ def main_page(request, book_id=None):
                 if not existing_book:
                     thumbnail = book_info.get("imageLinks", {}).get("thumbnail", "")
 
+                    # function that tries to convert a date from a custom format to a date object(Y-M-D)
                     def convert_to_date(date_str):
-                    #function that tries to convert a date from a custom format to a date object(Y-M-D)
-                        try:
-                            date = datetime.strptime(date_str, "%Y").date()
-                            return date
-                        except ValueError:
+                        if date_str:
+                            try:
+                                date = parse_date(date_str)
+                                return date
+                            except ValueError:
+                                return None
+                        else:
                             return None
 
                     new_book = Book(
@@ -258,6 +262,8 @@ class WishlistView(View):
             wishlist, created = Wishlist.objects.get_or_create(user=request.user)
             books_to_add = form.cleaned_data.get('books')
             wishlist.books.add(*books_to_add)
+        else:
+            raise
         return redirect('wishlist')
 
 class BooksReadView(View):
@@ -301,26 +307,28 @@ def search_for_book(request):
                   {'books': books})
 
 
-# class LikeDislikeView(View):
-#     def post(self, request, book_id):
-#         book = get_object_or_404(Book, pk=book_id)
-#         action = request.POST.get('action')
-#
-#
-#         if action not in ('like', 'dislike'):
-#             return HttpResponse(status=400)  # Bad request
-#
-#         friend_ids = request.user.friends.all().values_list('id', flat=True)
-#         users_in_wishlist = book.wishlist_set.filter(user__in=friend_ids).values_list('user', flat=True)
-#
-#         for user_id in users_in_wishlist:
-#             recipient = User.objects.get(pk=user_id)
-#
-#             notification = Notification(sender=request.user, recipient=recipient, book=book,
-#                                         message=f"The user {request.user.username} gave a {action} to book {book.title}")
-#             notification.save()
-#
-#         return redirect('book_details', book_id=book_id)
+class LikeDislikeView(View):
+    def post(self, request, book_id):
+        book = get_object_or_404(Book, pk=book_id)
+        action = request.POST.get('action')
+
+
+        if action not in ('like', 'dislike'):
+            return HttpResponse(status=400)  # Bad request
+
+        friend_ids = request.user.friends.all().values_list('id', flat=True)
+        users_in_wishlist = book.user_wishlist.filter(user__in=friend_ids).values_list('user', flat=True)
+
+        breakpoint()
+        for user_id in users_in_wishlist:
+            recipient = User.objects.get(pk=user_id)
+
+            notification = Notification(sender=request.user,
+                                        recipient=recipient,
+                                        book=book,
+                                        message=f"The user {request.user.username} gave a {action} to book {book.title}")
+            notification.save()
+        return redirect('book_details', book_id=book_id)
 class NotificationsView(View):
     def get(self, request):
         if request.user.is_authenticated:
