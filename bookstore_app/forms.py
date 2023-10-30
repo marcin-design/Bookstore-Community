@@ -32,6 +32,14 @@ class WishlistForm(forms.ModelForm):
         model = Wishlist
         fields = ['books']
 
+
+class RemoveFromWishlistForm(forms.Form):
+    books_to_remove = forms.ModelMultipleChoiceField(
+        queryset=Book.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
 class AddFriendForm(forms.Form):
     friend_username = forms.CharField(label='Username of Friend')
 

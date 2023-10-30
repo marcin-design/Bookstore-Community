@@ -7,7 +7,7 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist, User, Notification
 from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, UserBooksForm, \
-    CurrentlyReadingForm, UserRatingForm
+    CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm
 import requests
 from Bookstore_project import settings
 from django.utils.dateparse import parse_date
@@ -218,6 +218,7 @@ class UserProfileView(View):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         books_in_wishlist = wishlist.books.all()
         wishlist_form = WishlistForm()
+        remove_from_wishlist_form = RemoveFromWishlistForm()
 
         # Handle UserProfile
         user_profile, created = UserProfile.objects.get_or_create(user=request.user)
@@ -234,10 +235,13 @@ class UserProfileView(View):
             'currently_reading_form': currently_reading_form,
             'user_profile': user_profile,
             'notifications': user_notifications,
+            'remove_from_wishlist_form': remove_from_wishlist_form,
         })
+
     def post(self, request, *args, **kwargs):
         # Handle Wishlist
         wishlist_form = WishlistForm(request.POST)
+        remove_from_wishlist_form = RemoveFromWishlistForm(request.POST)
         if wishlist_form.is_valid():
             wishlist, created = Wishlist.objects.get_or_create(user=request.user)
             books_to_add = wishlist_form.cleaned_data.get('books')
@@ -249,8 +253,26 @@ class UserProfileView(View):
             currently_reading_form = CurrentlyReadingForm(request.POST, instance=user_profile)
             if currently_reading_form.is_valid():
                 currently_reading_form.save()
-                request.session['currently_reading_book_id'] = user_profile.currently_reading_book.id
 
+                if user_profile.currently_reading_book:
+                    request.session['currently_reading_book_id'] = user_profile.currently_reading_book.id
+                else:
+                    request.session['currently_reading_book_id'] = None
+
+        if request.method == 'POST':
+            if 'action' in request.POST and request.POST['action'] == 'remove_from_wishlist':
+                book_id = request.POST['book_id']
+                wishlist = Wishlist.objects.get(user=request.user)
+                book_to_remove = Book.objects.get(id=book_id)
+                wishlist.books.remove(book_to_remove)
+
+        return redirect('user_profile')
+
+def remove_from_wishlist(request, book_id):
+    if request.method == 'POST':
+        book = get_object_or_404(Book, pk=book_id)
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        wishlist.books.remove(book)
         return redirect('user_profile')
 
 

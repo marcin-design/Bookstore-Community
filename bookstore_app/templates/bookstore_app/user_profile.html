@@ -48,7 +48,14 @@
     <h4>Your Wishlist:</h4>
 <ul>
     {% for book in books_in_wishlist %}
-        <li>{{ book.title }}</li>
+        <li>
+            {{ book.title }}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="book_id" value="{{ book.id }}">
+                <button type="submit" name="action" value="remove_from_wishlist">Remove</button>
+            </form>
+        </li>
     {% empty %}
         <li>Your wishlist is empty.</li>
     {% endfor %}
@@ -56,9 +63,3 @@
 </body>
 </html>
 {% endblock %}
-
-
-<!-- -Opis użytkownika -> do bazy danych-->
-<!-- -Listę przeczytanych ksiażek (nie button)-->
-<!-- -Button usunięcia konta-->
-<!-- -Button edycji konta - opisu-->
