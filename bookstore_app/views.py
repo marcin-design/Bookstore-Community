@@ -266,6 +266,16 @@ class UserProfileView(View):
                 book_to_remove = Book.objects.get(id=book_id)
                 wishlist.books.remove(book_to_remove)
 
+        if request.method == 'POST':
+            if 'action' in request.POST and request.POST['action'] == 'remove_from_notifications':
+                notification_id = request.POST['notification_id']
+                try:
+                    notification_to_remove = Notification.objects.get(id=notification_id, recipient=request.user)
+                    notification_to_remove.delete()
+                except Notification.DoesNotExist:
+                    return redirect('invalid_form')
+
+
         return redirect('user_profile')
 
 def remove_from_wishlist(request, book_id):

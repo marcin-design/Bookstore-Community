@@ -25,6 +25,11 @@
     <li {% if not notification.is_read %} class="unread"{% endif %}>
         {{ notification.message }}
         <small>{{ notification.created_at }}</small>
+        <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="notification_id" value="{{ notification.id }}">
+                <button type="submit" name="action" value="remove_from_notifications">Delete</button>
+            </form>
     </li>
     {% empty %}
     <li>No notifications.</li>
