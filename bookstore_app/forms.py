@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Wishlist, Book, UserProfile
+from .models import Wishlist, Book, UserProfile, Review
 
 
 class RegistrationForm(UserCreationForm):
@@ -59,3 +59,8 @@ class CurrentlyReadingForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['currently_reading_book']
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['comment']

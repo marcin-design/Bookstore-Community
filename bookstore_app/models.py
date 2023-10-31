@@ -45,7 +45,6 @@ class Friendship(models.Model):
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    rating = models.PositiveIntegerField()
     comment = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 

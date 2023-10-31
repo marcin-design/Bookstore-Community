@@ -7,14 +7,14 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist, User, Notification
 from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, UserBooksForm, \
-    CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm
+    CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm, ReviewForm
 import requests
 from Bookstore_project import settings
 from django.utils.dateparse import parse_date
 
 
-
 class RegistrationView(View):
+    #view which lets a user registration
     def get(self, request, *args, **kwargs):
         form = RegistrationForm()
         return render(request,
@@ -32,6 +32,7 @@ class RegistrationView(View):
                           {'form': form})
 
 class LoginView(View):
+    #view for logging in into store
     def get(self, request, *args, **kwargs):
         form = LoginForm()
         return render(request,
@@ -41,8 +42,10 @@ class LoginView(View):
     def post(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
         if form.is_valid():
+            #those two variables download data from form and are validated
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+            #this 'user' variable authenticates the user
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -78,27 +81,31 @@ def main_page(request, book_id=None):
 
         if response.status_code == 200:
             books = []
+            # Processes the HTTP response and parses it as JSON
             data = response.json()
             google_books = data.get("items", [])
 
             for book_data in google_books:
+                # Download information about a specific book
                 book_info = book_data.get("volumeInfo", {})
+                # Download book genres from book information
                 genres = book_info.get("categories", [])
-
+                # Check whether a book with a given title already exists in the database
                 existing_book = Book.objects.filter(title=book_info.get("title", ""))
 
                 for book in existing_book:
                     books.append(book)
 
 
-
                 if not existing_book:
                     thumbnail = book_info.get("imageLinks", {}).get("thumbnail", "")
 
-                    # function that tries to convert a date from a custom format to a date object(Y-M-D)
+
                     def convert_to_date(date_str):
+                        # function that tries to convert a date from a custom format to a date object(Y-M-D)
                         if date_str:
                             try:
+                                # parse_date used due to more flexibility about received format
                                 date = parse_date(date_str)
                                 return date
                             except ValueError:
@@ -130,15 +137,20 @@ def main_page(request, book_id=None):
 class BookDetailsView(View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
+        reviews = Review.objects.filter(book=book)
         form = UserRatingForm()
-        return render(request,
-                      'bookstore_app/book_details.html',
-                      {'book': book, 'form': form})
+        review_form = ReviewForm()
+        return render(request, 'bookstore_app/book_details.html',
+                      {'book': book,
+                       'form': form,
+                       'review_form': review_form,
+                       'reviews': reviews})
 
     def post(self, request, book_id):
         book = get_object_or_404(Book, pk=book_id)
         action = request.POST.get('action')
         form = UserRatingForm(request.POST)
+        review_form = ReviewForm(request.POST)
 
         if form.is_valid():
             action = request.POST.get('action')
@@ -194,12 +206,24 @@ class BookDetailsView(View):
                     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
                     if book not in wishlist.books.all():
                         wishlist.books.add(book)
-
-            return render(request,
-                          'bookstore_app/book_details.html',
-                          {'book': book, 'form': form})
         else:
             return redirect('invalid_form')
+
+        if review_form.is_valid():
+            if action == 'Add review':
+                if review_form.is_valid():
+                    review = review_form.save()
+                    review.user = request.user
+                    review.book = book
+                    review.save()
+                else:
+                    return redirect('invalid_form')
+
+        reviews = Review.objects.filter(book=book)
+
+        return render(request,
+                      'bookstore_app/book_details.html',
+                      {'book': book, 'form': form, 'review_form': review_form, 'reviews': reviews})
 
 class InvalidFormView(View):
     def get(self, request, *args, **kwargs):

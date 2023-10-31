@@ -25,6 +25,12 @@
         <input type="submit" name="action" value="Like"><br>
         <input type="submit" name="action" value="Dislike">
     </form>
+
+    <form method="post" action="{% url 'book_details' book.id %}">
+        {% csrf_token %}
+        {{ review_form.comment }}
+        <input type="submit" name="action" value="Add review">
+    </form>
 </body>
 </html>
 {% endblock %}
