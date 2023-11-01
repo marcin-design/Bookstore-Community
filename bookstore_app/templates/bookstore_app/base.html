@@ -6,7 +6,7 @@
     <title>{% block title %}Bookstore Online{% endblock %}</title>
     <style>
          header {
-                    background-color: #FFA500;
+                    background-color: #915F6D;
                     color: white;
                     text-align: center;
                     padding: 1em 0;
@@ -14,10 +14,8 @@
         form {
             display: inline-block;
             margin-right: 10px;
-        }
-        #user_description {
-            margin-top: 20px;
-            display: block;
+            margin-bottom: 10px;
+
         }
         h1 {
             text-align: center;
@@ -27,8 +25,19 @@
             padding: 1em 0;
             background-color: #f2f2f2;
         }
+        button {
+            background-color: #413839;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+    }
+        div {
+            text-align: center;
+
+        }
     </style>
-<body>
+<body style="background-color: #DCD0FF;">
     <header>
         <h1>Bookstore Online</h1>
     </header>
@@ -38,6 +47,7 @@
     <input type="text" name="genre" placeholder="Search by genre">
     <button type="submit">Search</button>
         </form><br>
+    <div>
     <form method="get" action="{% url 'main' %}">
         <input type="submit" value="Main Page">
     </form>
@@ -62,6 +72,7 @@
     <form method="get" action="{% url 'registration' %}">
         <input type="submit" value="Create a New Account">
     </form>
+    </div>
         {% block content %}
         {% endblock %}
     <footer>
