@@ -11,6 +11,7 @@ from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, A
 import requests
 from Bookstore_project import settings
 from django.utils.dateparse import parse_date
+from django.views.generic.detail import DetailView
 
 
 class RegistrationView(View):
@@ -298,9 +299,27 @@ class UserProfileView(View):
                     notification_to_remove.delete()
                 except Notification.DoesNotExist:
                     return redirect('invalid_form')
-
-
         return redirect('user_profile')
+
+class OtherUserProfileView(View):
+    def get(self, request, user_id):
+        other_user_profile = get_object_or_404(UserProfile, user__id=user_id)
+        # Download information about user wanted to visit
+        user_to_display = other_user_profile.user
+
+        wishlist, created = Wishlist.objects.get_or_create(user=user_to_display)
+        books_in_wishlist = wishlist.books.all()
+        wishlist_form = WishlistForm()
+        currently_reading_form = CurrentlyReadingForm(instance=other_user_profile)
+
+        return render(request, 'bookstore_app/other_user_profile.html', {
+            'user_to_display': user_to_display,
+            'books_in_wishlist': books_in_wishlist,
+            'wishlist_form': wishlist_form,
+            'user_profile': other_user_profile,
+            'currently_reading_form': currently_reading_form,
+        })
+
 
 def remove_from_wishlist(request, book_id):
     if request.method == 'POST':
@@ -412,5 +431,11 @@ def search_for_book(request):
     return render(request,
                   'bookstore_app/search_for_book.html',
                   {'books': books})
+
+
+# class FriendProfileView(DetailView):
+#     model = UserProfile
+#     template_name = 'bookstore_app/friends_list.html'
+#     context_object_name = 'friend_profile'
 
 

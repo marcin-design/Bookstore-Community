@@ -9,6 +9,7 @@ urlpatterns = [
     path('main/', bk_views.main_page, name='main'),
     path('logout/', bk_views.logout_view, name='logout'),
     path('user_profile/', bk_views.UserProfileView.as_view(), name='user_profile'),
+    path('other_user_profile/<int:user_id>/', bk_views.OtherUserProfileView.as_view(), name='other_user_profile'),
     path('add_friend/', bk_views.AddFriendView.as_view(), name='add_friend'),
     path('friends_list/', bk_views.FriendsListView.as_view(), name='list_of_friends'),
     path('remove_friend/<int:friend_id>/', bk_views.remove_from_friends_list, name='remove_friend'),

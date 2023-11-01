@@ -1,0 +1,43 @@
+{% extends 'bookstore_app/base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Friend Page</title>
+    <style>
+        form {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        #user_description {
+            margin-top: 20px;
+            display: block;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>This Page is, {{ user_to_display.first_name }} ({{ user_to_display.username }})</h1>
+    <h4>Your Friend Currently Reading Book:</h4>
+<ul>
+    {% if user_profile.currently_reading_book %}
+        {{ user_profile.currently_reading_book.title }}
+    {% else %}
+        Not currently reading any <book class=""></book>
+    {% endif %}
+</ul>
+    <h4>Your Friend Wishlist:</h4>
+<ul>
+    {% for book in books_in_wishlist %}
+        <li>
+            {{ book.title }}
+        </li>
+    {% empty %}
+        <li>Your wishlist is empty.</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
+{% endblock %}
