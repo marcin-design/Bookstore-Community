@@ -8,16 +8,20 @@
 <body>
     <h1>Your Friends</h1>
         <form method="get" action="{% url 'add_friend' %}">
-        <input type="submit" value="Add a new Friend">
+            <input type="submit" value="Add a new Friend">
         </form>
-
     <ul>
-        {% for friend in friends %}
-            <li>{{ friend.user.username }}</li>
-        {% empty %}
-            <li>You don't have any friends yet.</li>
-        {% endfor %}
-    </ul>
+    {% for friend in friends %}
+        <li>{{ friend.user.username }}</li>
+        <form method="post" action="{% url 'remove_friend' friend.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="friend_id" value="{{ friend.id }}">
+            <input type="submit" name="action" value="Remove the friend">
+        </form>
+    {% empty %}
+        <li>You don't have any friends yet.</li>
+    {% endfor %}
+</ul>
 </body>
 </html>
 {% endblock %}

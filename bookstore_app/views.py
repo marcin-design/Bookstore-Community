@@ -7,7 +7,7 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Book, UserProfile, Friendship, Review, Wishlist, User, Notification
 from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, UserBooksForm, \
-    CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm, ReviewForm
+    CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm, ReviewForm, RemoveFriendForm
 import requests
 from Bookstore_project import settings
 from django.utils.dateparse import parse_date
@@ -73,7 +73,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "White",
+            "q": "Heroes",
             "key": api_key,
         }
 
@@ -313,7 +313,9 @@ def remove_from_wishlist(request, book_id):
 class AddFriendView(View):
     def get(self, request):
         form = AddFriendForm()
-        return render(request, 'bookstore_app/add_friend.html', {'form': form})
+        return render(request,
+                      'bookstore_app/add_friend.html',
+                      {'form': form})
 
     def post(self, request):
         form = AddFriendForm(request.POST)
@@ -337,12 +339,20 @@ class AddFriendView(View):
 
 class FriendsListView(View):
     def get(self, request, *args, **kwargs):
+        form = RemoveFriendForm()
         user_profile, created = UserProfile.objects.get_or_create(user=request.user)
         friends = user_profile.friends.all()
         return render(request,
                       'bookstore_app/friends_list.html',
                       {'friends': friends})
 
+def remove_from_friends_list(request, friend_id):
+    #function for removing a user from the friends
+    if request.method == 'POST':
+        friend_id = request.POST.get('friend_id')
+        the_friend = get_object_or_404(UserProfile, pk=friend_id)
+        request.user.userprofile.friends.remove(the_friend)
+        return redirect('list_of_friends')
 
 class WishlistView(View):
     def get(self, request):

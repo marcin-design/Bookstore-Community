@@ -43,6 +43,10 @@ class RemoveFromWishlistForm(forms.Form):
 class AddFriendForm(forms.Form):
     friend_username = forms.CharField(label='Username of Friend')
 
+
+class RemoveFriendForm(forms.Form):
+    friend_username = forms.CharField(label='Username of Friend')
+
 class UserRatingForm(forms.Form):
     like = forms.CharField(required=False, widget=forms.HiddenInput(), initial="like")
     dislike = forms.CharField(required=False, widget=forms.HiddenInput(), initial="dislike")
