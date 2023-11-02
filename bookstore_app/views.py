@@ -74,7 +74,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Heroes",
+            "q": "Golem",
             "key": api_key,
         }
 
@@ -201,7 +201,7 @@ class BookDetailsView(View):
                             notification.save()
 
         if review_form.is_valid():
-            #feature which letting a user to add comment in the specific book view
+            # feature which letting a user add a comment in the specific book view
             action = request.POST.get('action')
             if action == 'Add review':
                 review = review_form.save(commit=False)
@@ -210,15 +210,13 @@ class BookDetailsView(View):
                 review.save()
                 return redirect('book_details', book_id=book.id)
 
-            reviews = Review.objects.filter(book=book)
-            return render(request,
-                          'bookstore_app/book_details.html',
-                          {'book': book,
-                           'form': form,
-                           'review_form': review_form,
-                           'reviews': reviews})
-        else:
-            return HttpResponse("Invalid action or form data.")
+        reviews = Review.objects.filter(book=book)
+        return render(request,
+                      'bookstore_app/book_details.html',
+                      {'book': book,
+                       'form': form,
+                       'review_form': review_form,
+                       'reviews': reviews})
 
 
 class InvalidFormView(View):
