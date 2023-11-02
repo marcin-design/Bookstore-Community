@@ -40,6 +40,14 @@
         <li>Your wishlist is empty.</li>
     {% endfor %}
 </ul>
+<h4>Books Read by {{ user_to_display.username }}:</h4>
+<ul>
+    {% for book in books_read_list %}
+        <li>
+        <a href="{% url 'book_details' book.id %}">{{ book.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
 </body>
 </html>
 {% endblock %}

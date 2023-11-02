@@ -314,6 +314,7 @@ class OtherUserProfileView(View):
         books_in_wishlist = wishlist.books.all()
         wishlist_form = WishlistForm()
         currently_reading_form = CurrentlyReadingForm(instance=other_user_profile)
+        books_read_list = user_to_display.userprofile.books_read_list.all()
 
         return render(request, 'bookstore_app/other_user_profile.html', {
             'user_to_display': user_to_display,
@@ -321,6 +322,7 @@ class OtherUserProfileView(View):
             'wishlist_form': wishlist_form,
             'user_profile': other_user_profile,
             'currently_reading_form': currently_reading_form,
+            'books_read_list': books_read_list,
         })
 
 
