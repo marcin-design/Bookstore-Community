@@ -12,9 +12,8 @@ import requests
 from Bookstore_project import settings
 
 
-
 class RegistrationView(View):
-    #view which lets a user registration
+    # view which lets a user registration
     def get(self, request, *args, **kwargs):
         form = RegistrationForm()
         return render(request,
@@ -31,8 +30,9 @@ class RegistrationView(View):
                           'bookstore_app/incorrect_registration.html',
                           {'form': form})
 
+
 class LoginView(View):
-    #view for logging in into store
+    # view for logging in into store
     def get(self, request, *args, **kwargs):
         form = LoginForm()
         return render(request,
@@ -42,10 +42,10 @@ class LoginView(View):
     def post(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
         if form.is_valid():
-            #those two variables download data from form and are validated
+            # those two variables download data from form and are validated
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            #this 'user' variable authenticates the user
+            # this 'user' variable authenticates the user
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -68,7 +68,7 @@ def main_page(request, book_id=None):
         except (ValueError, Book.DoesNotExist):
             raise Http404("Book does not exist")
     else:
-        #the function aims to retrieve data from the Google Books API,
+        # the function aims to retrieve data from the Google Books API,
         # process it and save it in the database based on the Book model
         api_url = "https://www.googleapis.com/books/v1/volumes"
         api_key = settings.GOOGLE_BOOKS_API_KEY
@@ -230,6 +230,7 @@ class InvalidFormView(View):
     def get(self, request, *args, **kwargs):
         return render(request, "bookstore_app/invalid_form.html")
 
+
 def logout_view(request):
     # feature which allows a user logout from the account
     logout(request)
@@ -238,7 +239,8 @@ def logout_view(request):
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
-        #Handle notifications
+        # user profile with notifications, currently reading book, wishlist
+        # Handle notifications
         user_notifications = Notification.objects.filter(recipient=request.user)
         # Handle Wishlist
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
@@ -323,6 +325,7 @@ class OtherUserProfileView(View):
 
 
 def remove_from_wishlist(request, book_id):
+    # function which allows a user to remove book from the wishlist
     if request.method == 'POST':
         book = get_object_or_404(Book, pk=book_id)
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
@@ -331,6 +334,7 @@ def remove_from_wishlist(request, book_id):
 
 
 class AddFriendView(View):
+    # add a friend function
     def get(self, request):
         form = AddFriendForm()
         return render(request,
@@ -358,6 +362,7 @@ class AddFriendView(View):
 
 
 class FriendsListView(View):
+    # list of friends function
     def get(self, request, *args, **kwargs):
         form = RemoveFriendForm()
         user_profile, created = UserProfile.objects.get_or_create(user=request.user)
@@ -366,15 +371,18 @@ class FriendsListView(View):
                       'bookstore_app/friends_list.html',
                       {'friends': friends})
 
+
 def remove_from_friends_list(request, friend_id):
-    #function for removing a user from the friends
+    # function for removing a user from the friends
     if request.method == 'POST':
         friend_id = request.POST.get('friend_id')
         the_friend = get_object_or_404(UserProfile, pk=friend_id)
         request.user.userprofile.friends.remove(the_friend)
         return redirect('list_of_friends')
 
+
 class WishlistView(View):
+    # wishlist view, which displays a list of available books and allows a user to add them to the list
     def get(self, request):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         books_in_wishlist = wishlist.books.all()
@@ -404,7 +412,9 @@ class WishlistView(View):
             raise
         return redirect('wishlist')
 
+
 class BooksReadView(View):
+    # function shows a list of read books
     def get(self, request, *args, **kwargs):
         books_read, created = UserProfile.objects.get_or_create(user=request.user)
         books_in_list = books_read.books_read_list.all()
@@ -428,6 +438,7 @@ class BooksReadView(View):
 
 
 def search_for_book(request):
+    # search bar feature
     query_title = request.GET.get('title')
     query_author = request.GET.get('author')
     query_genre = request.GET.get('genre')
@@ -443,11 +454,5 @@ def search_for_book(request):
     return render(request,
                   'bookstore_app/search_for_book.html',
                   {'books': books})
-
-
-# class FriendProfileView(DetailView):
-#     model = UserProfile
-#     template_name = 'bookstore_app/friends_list.html'
-#     context_object_name = 'friend_profile'
 
 
