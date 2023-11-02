@@ -31,6 +31,16 @@
         {{ review_form.comment }}
         <input type="submit" name="action" value="Add review">
     </form>
+    <ul>
+        {% for comm in reviews %}
+        <li>
+            <strong>{{ comm.user.username }}</strong>:
+            {{ comm.comment }}
+        </li>
+        {% empty %}
+        <li>No reviews available.</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
 {% endblock %}

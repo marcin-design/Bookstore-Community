@@ -17,7 +17,7 @@
 <h4>Your Wishlist:</h4>
 <ul>
     {% for book in books_in_wishlist %}
-        <li>{{ book.title }}</li>
+        <li><a href="{% url 'book_details' book.id %}">{{ book.title }}</a></li>
     {% empty %}
         <li>Your wishlist is empty.</li>
     {% endfor %}

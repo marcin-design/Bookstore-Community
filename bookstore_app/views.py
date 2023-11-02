@@ -155,7 +155,6 @@ class BookDetailsView(View):
 
         if form.is_valid():
             action = request.POST.get('action')
-
             if action == 'Like':
                 if request.user not in book.liked_users.all():
                     if request.user not in book.disliked_users.all():
@@ -207,24 +206,24 @@ class BookDetailsView(View):
                     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
                     if book not in wishlist.books.all():
                         wishlist.books.add(book)
-        else:
-            return redirect('invalid_form')
+            if review_form.is_valid():
+                action = request.POST.get('action')
+                if action == 'Add review':
+                    if review_form.is_valid():
+                        review = review_form.save(commit=False)
+                        review.user = request.user
+                        review.book = book
+                        review.save()
+                    else:
+                        return redirect('invalid_form')
 
-        if review_form.is_valid():
-            if action == 'Add review':
-                if review_form.is_valid():
-                    review = review_form.save()
-                    review.user = request.user
-                    review.book = book
-                    review.save()
-                else:
-                    return redirect('invalid_form')
-
-        reviews = Review.objects.filter(book=book)
-
-        return render(request,
-                      'bookstore_app/book_details.html',
-                      {'book': book, 'form': form, 'review_form': review_form, 'reviews': reviews})
+            reviews = Review.objects.filter(book=book)
+            return render(request,
+                          'bookstore_app/book_details.html',
+                          {'book': book,
+                           'form': form,
+                           'review_form': review_form,
+                           'reviews': reviews})
 
 class InvalidFormView(View):
     def get(self, request, *args, **kwargs):
