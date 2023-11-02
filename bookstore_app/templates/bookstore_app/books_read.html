@@ -18,7 +18,9 @@
 <h4>Your Books Read list:</h4>
 <ul>
     {% for book in books_in_list %}
-        <li>{{ book.title }}</li>
+    <li>
+        <a href="{% url 'book_details' book.id %}">{{ book.title }}</a>
+    </li>
     {% empty %}
         <li>Your list is empty.</li>
     {% endfor %}
