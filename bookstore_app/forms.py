@@ -67,4 +67,4 @@ class CurrentlyReadingForm(forms.ModelForm):
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['comment', 'user']
+        fields = ['comment']

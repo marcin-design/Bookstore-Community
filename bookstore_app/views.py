@@ -123,13 +123,10 @@ def main_page(request, book_id=None):
                         user_rating=None,
                         thumbnail=thumbnail
                     )
-
                     new_book.save()
                     books.append(new_book)
-
         else:
             books = []
-
         return render(request,
                       'bookstore_app/main.html',
                       {'books': books})
@@ -149,7 +146,6 @@ class BookDetailsView(View):
 
     def post(self, request, book_id):
         book = get_object_or_404(Book, pk=book_id)
-        action = request.POST.get('action')
         form = UserRatingForm(request.POST)
         review_form = ReviewForm(request.POST)
 
@@ -188,6 +184,7 @@ class BookDetailsView(View):
                         book.dislikes += 1
                         book.disliked_users.add(request.user)
                         book.save()
+
             elif action == "Add to Wishlist":
                 wishlist, created = Wishlist.objects.get_or_create(user=request.user)
                 if book not in wishlist.books.all():
@@ -203,19 +200,14 @@ class BookDetailsView(View):
                             )
                             notification.save()
 
-                    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-                    if book not in wishlist.books.all():
-                        wishlist.books.add(book)
-            if review_form.is_valid():
-                action = request.POST.get('action')
-                if action == 'Add review':
-                    if review_form.is_valid():
-                        review = review_form.save(commit=False)
-                        review.user = request.user
-                        review.book = book
-                        review.save()
-                    else:
-                        return redirect('invalid_form')
+        if review_form.is_valid():
+            action = request.POST.get('action')
+            if action == 'Add review':
+                review = review_form.save(commit=False)
+                review.user = request.user
+                review.book = book
+                review.save()
+                return redirect('book_details', book_id=book.id)
 
             reviews = Review.objects.filter(book=book)
             return render(request,
@@ -224,6 +216,9 @@ class BookDetailsView(View):
                            'form': form,
                            'review_form': review_form,
                            'reviews': reviews})
+        else:
+            return HttpResponse("Invalid action or form data.")
+
 
 class InvalidFormView(View):
     def get(self, request, *args, **kwargs):

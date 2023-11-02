@@ -23,6 +23,8 @@
             <p><strong>Author:</strong> {{ book.author }}</p>
             {% if book.thumbnail %}
                 <img src="{{ book.thumbnail }}" alt="Book Cover">
+            <p>Users likes: {{ book.likes }}</p>
+            <p>Users dislikes: {{ book.dislikes }}</p>
             {% else %}
                 <p>No book cover available.</p>
             {% endif %}
