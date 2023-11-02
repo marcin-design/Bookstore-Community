@@ -18,9 +18,11 @@
 <ul>
     {% for book in books_in_wishlist %}
         <li><a href="{% url 'book_details' book.id %}">{{ book.title }}</a></li>
+        <button type="submit" name="action" value="remove_from_wishlist">Remove</button>
     {% empty %}
         <li>Your wishlist is empty.</li>
     {% endfor %}
+
 </ul>
 </body>
 </html>

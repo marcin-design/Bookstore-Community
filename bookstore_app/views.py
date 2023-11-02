@@ -1,17 +1,16 @@
-from datetime import datetime
-
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import get_user_model, login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
-from .models import Book, UserProfile, Friendship, Review, Wishlist, User, Notification
-from .forms import RegistrationForm, LoginForm, FriendsListForm, WishlistForm, AddFriendForm, UserBooksForm, \
+from django.utils.dateparse import parse_date
+
+from .models import Book, UserProfile, Review, Wishlist, User, Notification
+from .forms import RegistrationForm, LoginForm, WishlistForm, AddFriendForm, UserBooksForm, \
     CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm, ReviewForm, RemoveFriendForm
 import requests
 from Bookstore_project import settings
-from django.utils.dateparse import parse_date
-from django.views.generic.detail import DetailView
+
 
 
 class RegistrationView(View):
@@ -59,6 +58,7 @@ class LoginView(View):
 
 @login_required
 def main_page(request, book_id=None):
+    # a home page feature that is intended to display a list of books to the user
     if book_id:
         try:
             book_id_int = int(book_id)
@@ -74,7 +74,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Golem",
+            "q": "Rat",
             "key": api_key,
         }
 
@@ -97,10 +97,8 @@ def main_page(request, book_id=None):
                 for book in existing_book:
                     books.append(book)
 
-
                 if not existing_book:
                     thumbnail = book_info.get("imageLinks", {}).get("thumbnail", "")
-
 
                     def convert_to_date(date_str):
                         # function that tries to convert a date from a custom format to a date object(Y-M-D)
@@ -133,6 +131,8 @@ def main_page(request, book_id=None):
 
 
 class BookDetailsView(View):
+    # a feature that shows the user details of the book
+    # allows a user to interact like 'like', 'dislike', 'add to wishlist', and add comments
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         reviews = Review.objects.filter(book=book)
@@ -145,6 +145,9 @@ class BookDetailsView(View):
                        'reviews': reviews})
 
     def post(self, request, book_id):
+        # after calling the 'like', 'dislike' action with user 'A',
+        # and then calling one of these actions with user 'B',
+        # user 'A' will receive a notification about the action taken by the friend.
         book = get_object_or_404(Book, pk=book_id)
         form = UserRatingForm(request.POST)
         review_form = ReviewForm(request.POST)
@@ -156,6 +159,8 @@ class BookDetailsView(View):
                     if request.user not in book.disliked_users.all():
                         users_who_liked = book.liked_users.all()
                         for user in users_who_liked:
+                            # in this loop, other users (who already liked or disliked a book)
+                            # see a notification about triggered action
                             if user != request.user:
                                 notification = Notification(
                                     recipient=user,
@@ -187,6 +192,7 @@ class BookDetailsView(View):
 
             elif action == "Add to Wishlist":
                 wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+                # this line tries to download or create (if doesn't exist) a wishlist object.
                 if book not in wishlist.books.all():
                     wishlist.books.add(book)
 
@@ -201,7 +207,7 @@ class BookDetailsView(View):
                             notification.save()
 
         if review_form.is_valid():
-            # feature which letting a user add a comment in the specific book view
+            # feature which letting a user add a comment in the specific book view.
             action = request.POST.get('action')
             if action == 'Add review':
                 review = review_form.save(commit=False)
@@ -220,10 +226,12 @@ class BookDetailsView(View):
 
 
 class InvalidFormView(View):
+    # the message from "invalid_form.html" appears when form is not valid.
     def get(self, request, *args, **kwargs):
         return render(request, "bookstore_app/invalid_form.html")
 
 def logout_view(request):
+    # feature which allows a user logout from the account
     logout(request)
     return render(request, 'bookstore_app/logout.html')
 
@@ -370,10 +378,21 @@ class WishlistView(View):
     def get(self, request):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         books_in_wishlist = wishlist.books.all()
+        remove_from_wishlist_form = RemoveFromWishlistForm()
         form = WishlistForm()
+
+        if request.method == 'POST':
+            remove_from_wishlist_form = RemoveFromWishlistForm(request.POST)
+            if remove_from_wishlist_form.is_valid():
+                book_id = remove_from_wishlist_form.cleaned_data['book_id']
+                book_to_remove = Book.objects.get(id=book_id)
+                wishlist.books.remove(book_to_remove)
+
         return render(request,
                       'bookstore_app/wishlist.html',
-                      {'form': form, 'books_in_wishlist': books_in_wishlist})
+                      {'form': form,
+                       'books_in_wishlist': books_in_wishlist,
+                       'remove_from_wishlist_form': remove_from_wishlist_form})
 
     def post(self, request):
         form = WishlistForm(request.POST)
