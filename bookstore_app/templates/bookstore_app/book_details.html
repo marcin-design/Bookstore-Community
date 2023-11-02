@@ -35,7 +35,7 @@
         {% for comm in reviews %}
         <li>
             <strong>{{ comm.user.username }}</strong>:
-            {{ comm.comment }}
+            {{ comm.comment }} | {{ comm.date_created }}
         </li>
         {% empty %}
         <li>No reviews available.</li>

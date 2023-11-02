@@ -201,6 +201,7 @@ class BookDetailsView(View):
                             notification.save()
 
         if review_form.is_valid():
+            #feature which letting a user to add comment in the specific book view
             action = request.POST.get('action')
             if action == 'Add review':
                 review = review_form.save(commit=False)
