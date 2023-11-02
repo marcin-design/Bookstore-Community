@@ -23,7 +23,9 @@
     <h4>Your Friend Currently Reading Book:</h4>
 <ul>
     {% if user_profile.currently_reading_book %}
-        {{ user_profile.currently_reading_book.title }}
+        <a href="{% url 'book_details' user_profile.currently_reading_book.id %}">
+            {{ user_profile.currently_reading_book.title }}
+        </a>
     {% else %}
         Not currently reading any <book class=""></book>
     {% endif %}
@@ -32,7 +34,7 @@
 <ul>
     {% for book in books_in_wishlist %}
         <li>
-            {{ book.title }}
+            <a href="{% url 'book_details' book.id %}">{{ book.title }}</a>
         </li>
     {% empty %}
         <li>Your wishlist is empty.</li>
