@@ -2,5 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../testy_repozytorium/ONL_PYT_W_28_TDD" vcs="Git" />
   </component>
 </project>

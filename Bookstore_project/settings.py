@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,9 +84,12 @@ DATABASES = {
         'PASSWORD': 'mypassword',
         'HOST': 'localhost',
         'PORT': '5432',
+    },
+    'default2': {
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'ENGINE': 'django.db.backends.sqlite3',
+        }
     }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -133,3 +137,4 @@ GOOGLE_BOOKS_API_KEY = 'AIzaSyBw14gSfuKgN5jxYJ29cgwUWI7FTbHET1Q'
 LOGIN_URL = '/login/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 TEST_RUNNER = 'pytest-django.runner.PytestTestRunner'
+

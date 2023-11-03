@@ -248,6 +248,10 @@ class UserProfileView(View):
         wishlist_form = WishlistForm()
         remove_from_wishlist_form = RemoveFromWishlistForm()
 
+        books_read, created = UserProfile.objects.get_or_create(user=request.user)
+        books_in_list = books_read.books_read_list.all()
+        form = UserBooksForm()
+
         # Handle UserProfile
         user_profile, created = UserProfile.objects.get_or_create(user=request.user)
         currently_reading_form = CurrentlyReadingForm(instance=user_profile)
@@ -264,12 +268,14 @@ class UserProfileView(View):
             'user_profile': user_profile,
             'notifications': user_notifications,
             'remove_from_wishlist_form': remove_from_wishlist_form,
+            'books_in_list': books_in_list,
         })
 
     def post(self, request, *args, **kwargs):
         # Handle Wishlist
         wishlist_form = WishlistForm(request.POST)
         remove_from_wishlist_form = RemoveFromWishlistForm(request.POST)
+        books_read_form = UserBooksForm(request.POST)
         if wishlist_form.is_valid():
             wishlist, created = Wishlist.objects.get_or_create(user=request.user)
             books_to_add = wishlist_form.cleaned_data.get('books')
@@ -302,6 +308,12 @@ class UserProfileView(View):
                     notification_to_remove.delete()
                 except Notification.DoesNotExist:
                     return redirect('invalid_form')
+        if books_read_form.is_valid():
+            books_read, created = UserProfile.objects.get_or_create(user=request.user)
+            books_to_add = books_read_form.cleaned_data.get('books_read_list')
+            if books_to_add:
+                books_read.books_read_list.add(*books_to_add)
+            return redirect('read_books')
         return redirect('user_profile')
 
 class OtherUserProfileView(View):
