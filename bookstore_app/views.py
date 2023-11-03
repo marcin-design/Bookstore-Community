@@ -74,7 +74,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Rat",
+            "q": "Anime",
             "key": api_key,
         }
 
@@ -470,3 +470,7 @@ def search_for_book(request):
                   {'books': books})
 
 
+def div(a, b):
+    a = float(a)
+    b = float(b)
+    return a / b
