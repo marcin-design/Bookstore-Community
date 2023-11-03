@@ -91,3 +91,22 @@ def test_login_view_post_invalid_form():
     # checks whether the form passed to the view context is an instance of a LoginForm
     # this checks whether the view prepares and passes the appropriate form to the template
 
+
+@pytest.mark.django_db
+def test_logout_view():
+    factory = RequestFactory()
+    # tool for creating HTTP request objects
+    user = User.objects.create_user(username='testuser', password='testpassword', email='testmail@o2.pl')
+    # user object in the database using the create_user method
+    client = factory.get(reverse('logout'))
+    # HTTP GET request object to the logout view
+    login_user = login(client, user)
+    # logining in a user
+    assert client.user.is_authenticated
+    # checking if a user is logged in
+    response = logout_view(client)
+    # checking if the user is authenticated after logging in
+    assert response.status_code == 200
+    # checking if logout went correctly
+    assert not client.user.is_authenticated
+    # after logging out, checking again to see if the user is no longer authenticated
