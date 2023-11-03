@@ -272,23 +272,24 @@ class UserProfileView(View):
         })
 
     def post(self, request, *args, **kwargs):
-        # Handle Wishlist
         wishlist_form = WishlistForm(request.POST)
-        remove_from_wishlist_form = RemoveFromWishlistForm(request.POST)
         books_read_form = UserBooksForm(request.POST)
         if wishlist_form.is_valid():
+            # adding book to wishlist
             wishlist, created = Wishlist.objects.get_or_create(user=request.user)
             books_to_add = wishlist_form.cleaned_data.get('books')
+            # selected books from the wishlist_form are read here.
             wishlist.books.add(*books_to_add)
 
-        # Handle UserProfile
-        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
         if request.method == 'POST':
+            user_profile, created = UserProfile.objects.get_or_create(user=request.user)
             currently_reading_form = CurrentlyReadingForm(request.POST, instance=user_profile)
             if currently_reading_form.is_valid():
                 currently_reading_form.save()
 
                 if user_profile.currently_reading_book:
+                    # checks whether the user has the currently reading book assigned to their profile
+                    # If so, currently_reading_book_id is set in the user session to the ID of the book currently being read
                     request.session['currently_reading_book_id'] = user_profile.currently_reading_book.id
                 else:
                     request.session['currently_reading_book_id'] = None
@@ -469,8 +470,3 @@ def search_for_book(request):
                   'bookstore_app/search_for_book.html',
                   {'books': books})
 
-
-def div(a, b):
-    a = float(a)
-    b = float(b)
-    return a / b
