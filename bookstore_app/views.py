@@ -279,6 +279,7 @@ class UserProfileView(View):
         if wishlist_form.is_valid():
             # adding book to wishlist
             wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+            books_in_wishlist = wishlist.books.all()
             books_to_add = wishlist_form.cleaned_data.get('books')
             # selected books from the wishlist_form are read here.
             wishlist.books.add(*books_to_add)
@@ -363,12 +364,14 @@ class AddFriendView(View):
         if form.is_valid():
             friend_username = form.cleaned_data['friend_username']
             user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+            friends = user_profile.friends.all()
             try:
                 friend = User.objects.get(username=friend_username)
 
                 if friend != request.user:
-                    friend_profile, _ = UserProfile.objects.get_or_create(user=friend)
-                    user_profile.friends.add(friend_profile)
+                    if len(friends) < 10:
+                        friend_profile, _ = UserProfile.objects.get_or_create(user=friend)
+                        user_profile.friends.add(friend_profile)
                 else:
                     return render(request, 'bookstore_app/user_add_self.html')
 
@@ -404,7 +407,10 @@ class WishlistView(View):
         books_in_wishlist = wishlist.books.all()
         remove_from_wishlist_form = RemoveFromWishlistForm()
         form = WishlistForm()
-        return render(request, 'bookstore_app/wishlist.html', {'form': form, 'books_in_wishlist': books_in_wishlist, 'remove_from_wishlist_form': remove_from_wishlist_form})
+        return render(request,
+                      'bookstore_app/wishlist.html',
+                      {'form': form, 'books_in_wishlist': books_in_wishlist,
+                       'remove_from_wishlist_form': remove_from_wishlist_form})
 
     def post(self, request):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
@@ -422,7 +428,7 @@ class WishlistView(View):
                 # Adding a book to the Wishlist
                 form = WishlistForm(request.POST)
                 if form.is_valid():
-                    if len(books_in_wishlist) < 15:
+                    if len(books_in_wishlist) < 10:
                         books_to_add = form.cleaned_data.get('books')
                         wishlist.books.add(*books_to_add)
                 else:
