@@ -85,7 +85,11 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
     },
-}
+    'test': {
+            'NAME': BASE_DIR/ 'db.sqlite3',
+            'ENGINE': 'django.db.backends.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -132,5 +136,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 GOOGLE_BOOKS_API_KEY = 'AIzaSyBw14gSfuKgN5jxYJ29cgwUWI7FTbHET1Q'
 LOGIN_URL = '/login/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-TEST_RUNNER = 'pytest-django.runner.PytestTestRunner'
+
 

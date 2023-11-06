@@ -4,6 +4,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_date
+from django.core.exceptions import ValidationError
+
 
 from .models import Book, UserProfile, Review, Wishlist, User, Notification
 from .forms import RegistrationForm, LoginForm, WishlistForm, AddFriendForm, UserBooksForm, \
@@ -74,7 +76,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Anime",
+            "q": "Marvel",
             "key": api_key,
         }
 
@@ -397,34 +399,32 @@ def remove_from_friends_list(request, friend_id):
 
 
 class WishlistView(View):
-    # wishlist view, which displays a list of available books and allows a user to add them to the list
     def get(self, request):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         books_in_wishlist = wishlist.books.all()
         remove_from_wishlist_form = RemoveFromWishlistForm()
         form = WishlistForm()
-
-        if request.method == 'POST':
-            remove_from_wishlist_form = RemoveFromWishlistForm(request.POST)
-            if remove_from_wishlist_form.is_valid():
-                book_id = remove_from_wishlist_form.cleaned_data['book_id']
-                book_to_remove = Book.objects.get(id=book_id)
-                wishlist.books.remove(book_to_remove)
-
-        return render(request,
-                      'bookstore_app/wishlist.html',
-                      {'form': form,
-                       'books_in_wishlist': books_in_wishlist,
-                       'remove_from_wishlist_form': remove_from_wishlist_form})
+        return render(request, 'bookstore_app/wishlist.html', {'form': form, 'books_in_wishlist': books_in_wishlist, 'remove_from_wishlist_form': remove_from_wishlist_form})
 
     def post(self, request):
-        form = WishlistForm(request.POST)
-        if form.is_valid():
-            wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-            books_to_add = form.cleaned_data.get('books')
-            wishlist.books.add(*books_to_add)
-        else:
-            raise
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        if request.method == 'POST':
+            if 'action' in request.POST:
+                book_id = request.POST['action']
+                try:
+                    # Removing a book from the Wishlist
+                    book_to_remove = Book.objects.get(id=book_id)
+                    wishlist.books.remove(book_to_remove)
+                except Book.DoesNotExist:
+                    raise ValidationError("Invalid book ID")
+            else:
+                # Adding a book to the Wishlist
+                form = WishlistForm(request.POST)
+                if form.is_valid():
+                    books_to_add = form.cleaned_data.get('books')
+                    wishlist.books.add(*books_to_add)
+                else:
+                    raise ValidationError("Invalid form data")
         return redirect('wishlist')
 
 

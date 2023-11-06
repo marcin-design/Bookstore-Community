@@ -1,12 +1,5 @@
 {% extends 'bookstore_app/base.html' %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Wishlist</title>
-</head>
-<body>
 <h1>Wishlist</h1>
 <form method="post">
     {% csrf_token %}
@@ -17,13 +10,15 @@
 <h4>Your Wishlist:</h4>
 <ul>
     {% for book in books_in_wishlist %}
-        <li><a href="{% url 'book_details' book.id %}">{{ book.title }}</a></li>
-        <button type="submit" name="action" value="remove_from_wishlist">Remove</button>
+        <li>
+            <a href="{% url 'book_details' book.id %}">{{ book.title }}</a>
+            <form method="post" action="{% url 'wishlist' %}">
+                {% csrf_token %}
+                <button type="submit" name="action" value="{{ book.id }}">Remove</button>
+            </form>
+        </li>
     {% empty %}
         <li>Your wishlist is empty.</li>
     {% endfor %}
-
 </ul>
-</body>
-</html>
 {% endblock %}
