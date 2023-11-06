@@ -76,7 +76,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Karate",
+            "q": "Piekara",
             "key": api_key,
         }
 
