@@ -56,7 +56,7 @@
 <ul>
     {% for book in books_in_wishlist %}
         <li>
-            <a href="{% url 'book_details' book.id %}">{{ book.title }}</a>
+            <a href="{% url 'book_details' book.id %}" style="color: black">{{ book.title }}</a>
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="book_id" value="{{ book.id }}">
@@ -71,7 +71,7 @@
 <ul>
     {% for book in books_in_list %}
     <li>
-        <a href="{% url 'book_details' book.id %}">{{ book.title }}</a>
+        <a href="{% url 'book_details' book.id %}" style="color: black">{{ book.title }}</a>
     </li>
     {% empty %}
         <li>Your list is empty.</li>

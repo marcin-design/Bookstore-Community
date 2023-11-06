@@ -12,6 +12,7 @@
         h1 {
             text-align: center;
         }
+
     </style>
 </head>
 <body>
@@ -19,7 +20,7 @@
     <ul>
     {% for book in books %}
         <li>
-            <h3><a href="{% url 'book_details' book.id %}">{{ book.title }}</a></h3>
+            <h3><a href="{% url 'book_details' book.id %}" style="color: black">{{ book.title }}</a></h3>
             <p><strong>Author:</strong> {{ book.author }}</p>
             {% if book.thumbnail %}
                 <img src="{{ book.thumbnail }}" alt="Book Cover">

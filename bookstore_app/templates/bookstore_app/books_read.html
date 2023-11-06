@@ -19,7 +19,7 @@
 <ul>
     {% for book in books_in_list %}
     <li>
-        <a href="{% url 'book_details' book.id %}">{{ book.title }}</a>
+        <a href="{% url 'book_details' book.id %}" style="color: black">{{ book.title }}</a>
     </li>
     {% empty %}
         <li>Your list is empty.</li>

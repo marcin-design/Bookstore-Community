@@ -22,7 +22,7 @@
     <ul>
     {% for friend in friends %}
         <li>
-        <a href="{% url 'other_user_profile' friend.user.id %}">{{ friend.user.username }}</a>
+        <a href="{% url 'other_user_profile' friend.user.id %}" style="color: black">{{ friend.user.username }}</a>
       </li>
       </li>
         <form method="post" name="buttons" action="{% url 'remove_friend' friend.id %}">
