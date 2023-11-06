@@ -408,6 +408,7 @@ class WishlistView(View):
 
     def post(self, request):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        books_in_wishlist = wishlist.books.all()
         if request.method == 'POST':
             if 'action' in request.POST:
                 book_id = request.POST['action']
@@ -421,8 +422,9 @@ class WishlistView(View):
                 # Adding a book to the Wishlist
                 form = WishlistForm(request.POST)
                 if form.is_valid():
-                    books_to_add = form.cleaned_data.get('books')
-                    wishlist.books.add(*books_to_add)
+                    if len(books_in_wishlist) < 15:
+                        books_to_add = form.cleaned_data.get('books')
+                        wishlist.books.add(*books_to_add)
                 else:
                     raise ValidationError("Invalid form data")
         return redirect('wishlist')
