@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 
 from .models import Book, UserProfile, Review, Wishlist, User, Notification
 from .forms import RegistrationForm, LoginForm, WishlistForm, AddFriendForm, UserBooksForm, \
-    CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm, ReviewForm, RemoveFriendForm
+    CurrentlyReadingForm, UserRatingForm, RemoveFromWishlistForm, ReviewForm, RemoveFriendForm, AvatarForm
 import requests
 from Bookstore_project import settings
 
@@ -256,6 +256,7 @@ class UserProfileView(View):
         books_in_wishlist = wishlist.books.all()
         wishlist_form = WishlistForm()
         remove_from_wishlist_form = RemoveFromWishlistForm()
+        avatar_form = AvatarForm()
 
         books_read, created = UserProfile.objects.get_or_create(user=request.user)
         books_in_list = books_read.books_read_list.all()
@@ -278,6 +279,7 @@ class UserProfileView(View):
             'notifications': user_notifications,
             'remove_from_wishlist_form': remove_from_wishlist_form,
             'books_in_list': books_in_list,
+            'avatar_form': avatar_form,
         })
 
     def post(self, request, *args, **kwargs):
@@ -319,6 +321,17 @@ class UserProfileView(View):
                     notification_to_remove.delete()
                 except Notification.DoesNotExist:
                     return redirect('invalid_form')
+
+        if request.method == 'POST':
+            avatar_form = AvatarForm(request.POST, request.FILES)
+            if avatar_form.is_valid():
+                request.user.avatar = avatar_form.cleaned_data['avatar']
+                request.user.userprofile.save()
+                return redirect('user_profile')
+            return render(request,
+                          'bookstore_app/user_profile.html',
+                          {'avatar_form': avatar_form})
+
         if books_read_form.is_valid():
             books_read, created = UserProfile.objects.get_or_create(user=request.user)
             books_to_add = books_read_form.cleaned_data.get('books_read_list')

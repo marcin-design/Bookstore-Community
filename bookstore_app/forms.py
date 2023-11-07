@@ -40,6 +40,7 @@ class RemoveFromWishlistForm(forms.Form):
         required=False,
     )
 
+
 class AddFriendForm(forms.Form):
     friend_username = forms.CharField(label='Username of Friend')
 
@@ -47,11 +48,13 @@ class AddFriendForm(forms.Form):
 class RemoveFriendForm(forms.Form):
     friend_username = forms.CharField(label='Username of Friend')
 
+
 class UserRatingForm(forms.Form):
     like = forms.CharField(required=False, widget=forms.HiddenInput(), initial="like")
     dislike = forms.CharField(required=False, widget=forms.HiddenInput(), initial="dislike")
     add_wishlist = forms.CharField(widget=forms.HiddenInput(), initial="add_wishlist")
     user_has_rated = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
+
 
 class UserBooksForm(forms.ModelForm):
     class Meta:
@@ -64,7 +67,12 @@ class CurrentlyReadingForm(forms.ModelForm):
         model = UserProfile
         fields = ['currently_reading_book']
 
+
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = ['comment']
+
+
+class AvatarForm(forms.Form):
+    avatar = forms.ImageField()

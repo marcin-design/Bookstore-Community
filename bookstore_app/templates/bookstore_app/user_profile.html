@@ -77,6 +77,16 @@
         <li>Your list is empty.</li>
     {% endfor %}
 </ul>
+<ul>
+    <li>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ avatar_form.as_p }}
+            <img src="{{ request.user.avatar.url }}" alt="User Avatar">
+            <button type="submit">Upload Avatar</button>
+        </form>
+    </li>
+</ul>
 </body>
 </html>
 {% endblock %}
