@@ -23,7 +23,7 @@ class Book(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    avatar = models.ImageField(null=True, blank=True)
     books_read_list = models.ManyToManyField(Book, related_name='read_by_user')
     currently_reading_book = models.ForeignKey(Book,
                                      on_delete=models.SET_NULL,
@@ -32,6 +32,9 @@ class UserProfile(models.Model):
     user_description = models.TextField(blank=True, null=True)
     has_access = models.BooleanField(default=True)
     friends = models.ManyToManyField('self', through='Friendship', symmetrical=False)
+    phone = models.CharField(max_length=200, null=True)
+
+
 
 class Friendship(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user_friendships')
@@ -65,3 +68,6 @@ class Notification(models.Model):
     message = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+
+
+

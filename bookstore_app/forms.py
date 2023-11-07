@@ -74,5 +74,12 @@ class ReviewForm(forms.ModelForm):
         fields = ['comment']
 
 
-class AvatarForm(forms.Form):
-    avatar = forms.ImageField()
+# class CustomerForm(forms.ModelForm):
+#     class Meta:
+#         model = Customer
+#         fields = ['profile_pic', 'phone', 'email']
+
+class AvatarForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar']

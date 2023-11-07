@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bookstore_app',
+    'avatar',
 ]
 
 MIDDLEWARE = [
@@ -125,15 +126,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 GOOGLE_BOOKS_API_KEY = 'AIzaSyBw14gSfuKgN5jxYJ29cgwUWI7FTbHET1Q'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'bookstore_app', 'avatars')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+MEDIA_URL = '/images/'
 GOOGLE_BOOKS_API_KEY = 'AIzaSyBw14gSfuKgN5jxYJ29cgwUWI7FTbHET1Q'
 LOGIN_URL = '/login/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'

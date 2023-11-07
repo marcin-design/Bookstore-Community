@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
             name='UserProfile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('avatar', models.ImageField(blank=True, null=True, upload_to='avatars/')),
+                ('avatar', models.ImageField(blank=True, null=True, upload_to='images/')),
                 ('has_access', models.BooleanField(default=True)),
                 ('books_read_list', models.ManyToManyField(related_name='read_by_user', to='bookstore_app.book')),
                 ('current_book', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='currently_reading', to='bookstore_app.book')),

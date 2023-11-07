@@ -322,15 +322,15 @@ class UserProfileView(View):
                 except Notification.DoesNotExist:
                     return redirect('invalid_form')
 
-        if request.method == 'POST':
-            avatar_form = AvatarForm(request.POST, request.FILES)
-            if avatar_form.is_valid():
-                request.user.avatar = avatar_form.cleaned_data['avatar']
-                request.user.userprofile.save()
-                return redirect('user_profile')
-            return render(request,
-                          'bookstore_app/user_profile.html',
-                          {'avatar_form': avatar_form})
+        # if 'avatar_form' in request.POST:
+        #     avatar_form = AvatarForm(request.POST, request.FILES)
+        #     if avatar_form.is_valid():
+        #         request.user.userprofile.avatar = avatar_form.cleaned_data['avatar']
+        #         request.user.userprofile.save()
+        #         return redirect('user_profile')
+        #     return render(request,
+        #                   'bookstore_app/user_profile.html',
+        #                   {'avatar_form': avatar_form})
 
         if books_read_form.is_valid():
             books_read, created = UserProfile.objects.get_or_create(user=request.user)
