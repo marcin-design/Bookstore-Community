@@ -26,7 +26,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ avatar_form.as_p }}
-            <img src="{{ userprofile.avatar.url }}" alt="User Avatar">
+            <img src="{{ request.user.userprofile.avatar.url }}" alt="User Avatar">
             <button type="submit">Upload Avatar</button>
         </form>
     </li>

@@ -1,4 +1,5 @@
 {% extends 'bookstore_app/base.html' %}
+{% load static %}
 {% block content %}
 <h3>Your Avatar</h3>
 <ul>
@@ -6,7 +7,9 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ avatar_form.as_p }}
-            <img src="{{ request.userprofile.avatar.url }}" alt="User Avatar">
+            <img src="{{ request.user.userprofile.avatar.url }}" alt="User Avatar">
+<!--            I am referring here to request -> modelu user -> modelu userprofile -> -->
+<!--            variable avatar in model userprofile -> url to see a img-->
             <button type="submit">Upload Avatar</button>
         </form>
     </li>
