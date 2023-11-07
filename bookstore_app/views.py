@@ -246,6 +246,22 @@ def logout_view(request):
     return render(request, 'bookstore_app/logout.html')
 
 
+class AvatarView(View):
+    template_name = 'bookstore_app/avatar.html'
+
+    def get(self, request):
+        avatar_form = AvatarForm()
+        return render(request, self.template_name, {'avatar_form': avatar_form})
+
+    def post(self, request):
+        avatar_form = AvatarForm(request.POST, request.FILES)
+        if avatar_form.is_valid():
+            # save sent avatar in a profile
+            request.user.userprofile.avatar = avatar_form.cleaned_data['avatar']
+            request.user.userprofile.save()
+            return redirect('avatar')
+        return render(request, self.template_name, {'avatar_form': avatar_form})
+
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
         # user profile with notifications, currently reading book, wishlist
@@ -322,15 +338,19 @@ class UserProfileView(View):
                 except Notification.DoesNotExist:
                     return redirect('invalid_form')
 
-        # if 'avatar_form' in request.POST:
-        #     avatar_form = AvatarForm(request.POST, request.FILES)
-        #     if avatar_form.is_valid():
-        #         request.user.userprofile.avatar = avatar_form.cleaned_data['avatar']
-        #         request.user.userprofile.save()
-        #         return redirect('user_profile')
-        #     return render(request,
-        #                   'bookstore_app/user_profile.html',
-        #                   {'avatar_form': avatar_form})
+        if 'avatar_form' in request.POST:
+            avatar_form = AvatarForm(request.POST, request.FILES)
+            if avatar_form.is_valid():
+                try:
+                    request.user.userprofile.avatar = avatar_form.cleaned_data['avatar']
+                    request.user.userprofile.save()
+                except Exception as e:
+                    print(f"Error saving avatar: {e}")
+                return redirect('user_profile')
+
+            return render(request,
+                          'bookstore_app/user_profile.html',
+                          {'avatar_form': avatar_form})
 
         if books_read_form.is_valid():
             books_read, created = UserProfile.objects.get_or_create(user=request.user)

@@ -139,4 +139,7 @@ GOOGLE_BOOKS_API_KEY = 'AIzaSyBw14gSfuKgN5jxYJ29cgwUWI7FTbHET1Q'
 LOGIN_URL = '/login/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
+TEMPLATE_CONTEXT_PROCESSORS = [
+    'django.core.context_processors.media',
+]
 

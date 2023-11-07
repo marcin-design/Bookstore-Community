@@ -1,0 +1,14 @@
+{% extends 'bookstore_app/base.html' %}
+{% block content %}
+<h3>Your Avatar</h3>
+<ul>
+    <li>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ avatar_form.as_p }}
+            <img src="{{ request.userprofile.avatar.url }}" alt="User Avatar">
+            <button type="submit">Upload Avatar</button>
+        </form>
+    </li>
+</ul>
+{% endblock %}

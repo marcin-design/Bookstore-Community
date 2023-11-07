@@ -22,6 +22,16 @@
 <body>
     <h1>Welcome, {{ user.first_name }} ({{ user.username }})</h1>
 <ul>
+    <li>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ avatar_form.as_p }}
+            <img src="{{ userprofile.avatar.url }}" alt="User Avatar">
+            <button type="submit">Upload Avatar</button>
+        </form>
+    </li>
+</ul>
+<ul>
     {% for notification in notifications %}
     <li {% if not notification.is_read %} class="unread"{% endif %}>
         {{ notification.message }}
@@ -77,16 +87,6 @@
     {% empty %}
         <li>Your list is empty.</li>
     {% endfor %}
-</ul>
-<ul>
-    <li>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ avatar_form.as_p }}
-            <img src="{{ request.user.avatar.url }}" alt="User Avatar">
-            <button type="submit">Upload Avatar</button>
-        </form>
-    </li>
 </ul>
 </body>
 </html>
