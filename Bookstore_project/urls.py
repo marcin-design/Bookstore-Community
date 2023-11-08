@@ -20,7 +20,7 @@ urlpatterns = [
     path('read_books/', bk_views.BooksReadView.as_view(), name='read_books'),
     path('search_book/', bk_views.search_for_book, name='query'),
     path('invalid_form/', bk_views.InvalidFormView.as_view(), name='invalid_form'),
-    path('avatar/', bk_views.AvatarView.as_view(), name='avatar'),
+    # path('avatar/', bk_views.AvatarView.as_view(), name='avatar'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

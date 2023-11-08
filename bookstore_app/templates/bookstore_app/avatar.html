@@ -2,16 +2,16 @@
 {% load static %}
 {% block content %}
 <h3>Your Avatar</h3>
-<ul>
-    <li>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ avatar_form.as_p }}
-            <img src="{{ request.user.userprofile.avatar.url }}" alt="User Avatar">
+             {% if request.user.userprofile.avatar %}
+            <img src="{{ request.user.userprofile.avatar.url }}" alt="User Avatar" style="width: 200px;">
+            {% else %}
+            <p>No avatar</p>
+            {% endif %}
 <!--            I am referring here to request -> modelu user -> modelu userprofile -> -->
 <!--            variable avatar in model userprofile -> url to see a img-->
             <button type="submit">Upload Avatar</button>
         </form>
-    </li>
-</ul>
 {% endblock %}

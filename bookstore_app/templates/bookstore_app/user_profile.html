@@ -21,16 +21,19 @@
 </head>
 <body>
     <h1>Welcome, {{ user.first_name }} ({{ user.username }})</h1>
-<ul>
-    <li>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ avatar_form.as_p }}
-            <img src="{{ request.user.userprofile.avatar.url }}" alt="User Avatar">
-            <button type="submit">Upload Avatar</button>
-        </form>
-    </li>
-</ul>
+<div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ avatar_form.as_p }}
+        {% if request.user.userprofile.avatar %}
+        <img src="{{ request.user.userprofile.avatar.url }}" alt="User Avatar" style="width: 200px;"><br>
+        {% else %}
+        <p>No avatar</p>
+        {% endif %}
+        <button type="submit">Upload Avatar</button>
+    </form>
+</div>
+
 <ul>
     {% for notification in notifications %}
     <li {% if not notification.is_read %} class="unread"{% endif %}>
