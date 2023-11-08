@@ -158,62 +158,58 @@ class BookDetailsView(View):
             action = request.POST.get('action')
             if action == 'Like':
                 if request.user not in book.liked_users.all():
-                    if request.user not in book.disliked_users.all():
-                        users_who_liked = book.liked_users.all()
-                        user_notifications = Notification.objects.filter(recipient=request.user)
+                    users_who_liked = book.liked_users.all()
+                    user_notifications = Notification.objects.filter(recipient=request.user)
+                    # checking if a user has less than 8 notifications
+                    if len(user_notifications) < 8:
+                        for user in users_who_liked:
+                            # loop which checking if a user already liked od disliked a book
+                            # additionally if a user's notification list is less than 8
+                            if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
+                                notification = Notification(
+                                    recipient=user,
+                                    sender=request.user,
+                                    book=book,
+                                    message=f"The user {request.user.username} gave a like to book: {book.title}"
+                                )
+                                notification.save()
 
-                        # checking if user has less than 8 notifications
-                        if len(user_notifications) < 8:
-                            for user in users_who_liked:
-                                # loop which checking if a user already liked od disliked a book
-                                # additionally if a user's notification list is less than 8
-                                if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
-                                    notification = Notification(
-                                        recipient=user,
-                                        sender=request.user,
-                                        book=book,
-                                        message=f"The user {request.user.username} gave a like to book: {book.title}"
-                                    )
-                                    notification.save()
-
-                        book.likes += 1
-                        book.liked_users.add(request.user)
+                    book.likes += 1
+                    book.liked_users.add(request.user)
+                    book.save()
+                elif request.user in book.liked_users.all():
+                    # checking if counter is bigger then zero
+                    if book.likes > 0:
+                        book.likes -= 1
+                        book.liked_users.remove(request.user)
                         book.save()
 
-            elif action == "Dislike":
+            elif action == 'Dislike':
                 if request.user not in book.disliked_users.all():
-                    if request.user not in book.liked_users.all():
-                        users_who_disliked = book.disliked_users.all()
-                        user_notifications = Notification.objects.filter(recipient=request.user)
-                        if len(user_notifications) < 8:
-                            for user in users_who_disliked:
-                                if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
-                                    notification = Notification(
-                                        recipient=user,
-                                        sender=request.user,
-                                        book=book,
-                                        message=f"The user {request.user.username} gave a dislike to book: {book.title}"
-                                    )
-                                    notification.save()
-                        book.dislikes += 1
-                        book.disliked_users.add(request.user)
+                    users_who_disliked = book.disliked_users.all()
+                    user_notifications = Notification.objects.filter(recipient=request.user)
+                    # checking if a user has less than 8 notifications
+                    if len(user_notifications) < 8:
+                        for user in users_who_disliked:
+                            # loop which checking if a user already liked od disliked a book
+                            # additionally if a user's notification list is less than 8
+                            if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
+                                notification = Notification(
+                                    recipient=user,
+                                    sender=request.user,
+                                    book=book,
+                                    message=f"The user {request.user.username} gave a dislike to book: {book.title}"
+                                )
+                                notification.save()
+                    book.dislikes += 1
+                    book.disliked_users.add(request.user)
+                    book.save()
+                elif request.user in book.disliked_users.all():
+                    # checking if counter is bigger then zero
+                    if book.dislikes > 0:
+                        book.dislikes -= 1
+                        book.disliked_users.remove(request.user)
                         book.save()
-
-            elif action == "Add to Wishlist":
-                wishlist, created = Wishlist.objects.get_or_create(user=request.user)
-                # this line tries to download or create (if doesn't exist) a wishlist object.
-                if book not in wishlist.books.all():
-                    wishlist.books.add(book)
-
-                    users_who_added_to_wishlist = book.wishlisted_users.all()
-                    for user in users_who_added_to_wishlist:
-                        if user != request.user:
-                            notification = Notification(
-                                recipient=user,
-                                sender=request.user,
-                                message=f"The user {request.user.username} added a book: {book.title} to wishlist",
-                            )
-                            notification.save()
 
         if review_form.is_valid():
             # feature which letting a user add a comment in the specific book view.
