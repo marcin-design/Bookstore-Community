@@ -337,7 +337,7 @@ class UserProfileView(View):
                 except Notification.DoesNotExist:
                     return redirect('invalid_form')
 
-        if request.method == 'POST':
+        if 'action' in request.POST and request.POST['action'] == 'upload_avatar':
             avatar_form = AvatarForm(request.POST, request.FILES)
             if avatar_form.is_valid():
                 request.user.userprofile.avatar = avatar_form.cleaned_data['avatar']
