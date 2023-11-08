@@ -54,12 +54,12 @@
 <form method="post">
     {% csrf_token %}
     {{ currently_reading_form.as_p }}
-    <button type="submit">Save</button>
+    <button type="submit" name="action" value="save_currently_reading">Save</button>
 </form>
     <h4>Your Currently Reading Book:</h4>
 <ul>
     {% if user_profile.currently_reading_book %}
-        <a href="{% url 'book_details' user_profile.currently_reading_book.id %}">
+        <a href="{% url 'book_details' user_profile.currently_reading_book.id %}" style="color: black">
             {{ user_profile.currently_reading_book.title }}
         </a>
     {% else %}

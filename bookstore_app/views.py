@@ -309,7 +309,7 @@ class UserProfileView(View):
             # selected books from the wishlist_form are read here.
             wishlist.books.add(*books_to_add)
 
-        if request.method == 'POST':
+        if 'action' in request.POST and request.POST['action'] == 'save_currently_reading':
             user_profile, created = UserProfile.objects.get_or_create(user=request.user)
             currently_reading_form = CurrentlyReadingForm(request.POST, instance=user_profile)
             if currently_reading_form.is_valid():
@@ -322,12 +322,11 @@ class UserProfileView(View):
                 else:
                     request.session['currently_reading_book_id'] = None
 
-        if request.method == 'POST':
-            if 'action' in request.POST and request.POST['action'] == 'remove_from_wishlist':
-                book_id = request.POST['book_id']
-                wishlist = Wishlist.objects.get(user=request.user)
-                book_to_remove = Book.objects.get(id=book_id)
-                wishlist.books.remove(book_to_remove)
+        if 'action' in request.POST and request.POST['action'] == 'remove_from_wishlist':
+            book_id = request.POST['book_id']
+            wishlist = Wishlist.objects.get(user=request.user)
+            book_to_remove = Book.objects.get(id=book_id)
+            wishlist.books.remove(book_to_remove)
 
         if request.method == 'POST':
             if 'action' in request.POST and request.POST['action'] == 'remove_from_notifications':
