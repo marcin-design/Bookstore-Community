@@ -20,6 +20,9 @@
 </head>
 <body>
     <h1>This Page is, {{ user_to_display.first_name }} ({{ user_to_display.username }})</h1>
+        <div>
+        <img src="{{ request.user.userprofile.avatar.url }}" alt="User Avatar" style="width: 200px;"><br>
+    </div>
     <h4>Your Friend Currently Reading Book:</h4>
 <ul>
     {% if user_profile.currently_reading_book %}
