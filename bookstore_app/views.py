@@ -76,7 +76,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Piekara",
+            "q": "Mróz",
             "key": api_key,
         }
 
@@ -158,25 +158,26 @@ class BookDetailsView(View):
             action = request.POST.get('action')
             if action == 'Like':
                 if request.user not in book.liked_users.all():
-                    users_who_liked = book.liked_users.all()
-                    user_notifications = Notification.objects.filter(recipient=request.user)
-                    # checking if a user has less than 8 notifications
-                    if len(user_notifications) < 8:
-                        for user in users_who_liked:
-                            # loop which checking if a user already liked od disliked a book
-                            # additionally if a user's notification list is less than 8
-                            if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
-                                notification = Notification(
-                                    recipient=user,
-                                    sender=request.user,
-                                    book=book,
-                                    message=f"The user {request.user.username} gave a like to book: {book.title}"
-                                )
-                                notification.save()
+                    if request.user not in book.disliked_users.all():
+                        users_who_liked = book.liked_users.all()
+                        user_notifications = Notification.objects.filter(recipient=request.user)
+                        # checking if a user has less than 8 notifications
+                        if len(user_notifications) < 8:
+                            for user in users_who_liked:
+                                # loop which checking if a user already liked od disliked a book
+                                # additionally if a user's notification list is less than 8
+                                if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
+                                    notification = Notification(
+                                        recipient=user,
+                                        sender=request.user,
+                                        book=book,
+                                        message=f"The user {request.user.username} gave a like to book: {book.title}"
+                                    )
+                                    notification.save()
 
-                    book.likes += 1
-                    book.liked_users.add(request.user)
-                    book.save()
+                        book.likes += 1
+                        book.liked_users.add(request.user)
+                        book.save()
                 elif request.user in book.liked_users.all():
                     # checking if counter is bigger then zero
                     if book.likes > 0:
@@ -186,24 +187,25 @@ class BookDetailsView(View):
 
             elif action == 'Dislike':
                 if request.user not in book.disliked_users.all():
-                    users_who_disliked = book.disliked_users.all()
-                    user_notifications = Notification.objects.filter(recipient=request.user)
-                    # checking if a user has less than 8 notifications
-                    if len(user_notifications) < 8:
-                        for user in users_who_disliked:
-                            # loop which checking if a user already liked od disliked a book
-                            # additionally if a user's notification list is less than 8
-                            if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
-                                notification = Notification(
-                                    recipient=user,
-                                    sender=request.user,
-                                    book=book,
-                                    message=f"The user {request.user.username} gave a dislike to book: {book.title}"
-                                )
-                                notification.save()
-                    book.dislikes += 1
-                    book.disliked_users.add(request.user)
-                    book.save()
+                    if request.user not in book.liked_users.all():
+                        users_who_disliked = book.disliked_users.all()
+                        user_notifications = Notification.objects.filter(recipient=request.user)
+                        # checking if a user has less than 8 notifications
+                        if len(user_notifications) < 8:
+                            for user in users_who_disliked:
+                                # loop which checking if a user already liked od disliked a book
+                                # additionally if a user's notification list is less than 8
+                                if user != request.user and len(Notification.objects.filter(recipient=user)) < 8:
+                                    notification = Notification(
+                                        recipient=user,
+                                        sender=request.user,
+                                        book=book,
+                                        message=f"The user {request.user.username} gave a dislike to book: {book.title}"
+                                    )
+                                    notification.save()
+                        book.dislikes += 1
+                        book.disliked_users.add(request.user)
+                        book.save()
                 elif request.user in book.disliked_users.all():
                     # checking if counter is bigger then zero
                     if book.dislikes > 0:
