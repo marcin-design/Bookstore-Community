@@ -22,10 +22,11 @@
         <li>
             <h3><a href="{% url 'book_details' book.id %}" style="color: black">{{ book.title }}</a></h3>
             <p><strong>Author:</strong> {{ book.author }}</p>
-            {% if book.thumbnail %}
-                <img src="{{ book.thumbnail }}" alt="Book Cover">
+
             <p>Users likes: {{ book.likes }}</p>
             <p>Users dislikes: {{ book.dislikes }}</p>
+             {% if book.thumbnail %}
+                <img src="{{ book.thumbnail }}" alt="Book Cover">
             {% else %}
                 <p>No book cover available.</p>
             {% endif %}
