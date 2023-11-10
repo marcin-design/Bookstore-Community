@@ -76,7 +76,7 @@ def main_page(request, book_id=None):
         api_key = settings.GOOGLE_BOOKS_API_KEY
 
         params = {
-            "q": "Mróz",
+            "q": "Sky",
             "key": api_key,
         }
 
@@ -140,11 +140,16 @@ class BookDetailsView(View):
         reviews = Review.objects.filter(book=book)
         form = UserRatingForm()
         review_form = ReviewForm()
+        wishlist_form = WishlistForm()
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        books_in_wishlist = wishlist.books.all()
         return render(request, 'bookstore_app/book_details.html',
                       {'book': book,
                        'form': form,
                        'review_form': review_form,
-                       'reviews': reviews})
+                       'reviews': reviews,
+                       'wishlist_form': wishlist_form,
+                       'books_in_wishlist': books_in_wishlist})
 
     def post(self, request, book_id):
         # after calling the 'like', 'dislike' action with user 'A',
@@ -153,6 +158,9 @@ class BookDetailsView(View):
         book = get_object_or_404(Book, pk=book_id)
         form = UserRatingForm(request.POST)
         review_form = ReviewForm(request.POST)
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        books_in_wishlist = wishlist.books.all()
+        wishlist_form = WishlistForm()
 
         if form.is_valid():
             action = request.POST.get('action')
@@ -213,6 +221,11 @@ class BookDetailsView(View):
                         book.disliked_users.remove(request.user)
                         book.save()
 
+            elif action == "Add to Wishlist":
+                wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+                if book not in wishlist.books.all():
+                    wishlist.books.add(book)
+
         if review_form.is_valid():
             # feature which letting a user add a comment in the specific book view.
             action = request.POST.get('action')
@@ -222,14 +235,15 @@ class BookDetailsView(View):
                 review.book = book
                 review.save()
                 return redirect('book_details', book_id=book.id)
-
         reviews = Review.objects.filter(book=book)
+
         return render(request,
                       'bookstore_app/book_details.html',
                       {'book': book,
                        'form': form,
                        'review_form': review_form,
-                       'reviews': reviews})
+                       'reviews': reviews,
+                       'wishlist_form': wishlist_form})
 
 
 class InvalidFormView(View):
@@ -243,22 +257,6 @@ def logout_view(request):
     logout(request)
     return render(request, 'bookstore_app/logout.html')
 
-
-# class AvatarView(View):
-#     template_name = 'bookstore_app/avatar.html'
-#
-#     def get(self, request):
-#         avatar_form = AvatarForm()
-#         return render(request, self.template_name, {'avatar_form': avatar_form})
-#
-#     def post(self, request):
-#         avatar_form = AvatarForm(request.POST, request.FILES)
-#         if avatar_form.is_valid():
-#             # save sent avatar in a profile
-#             request.user.userprofile.avatar = avatar_form.cleaned_data['avatar']
-#             request.user.userprofile.save()
-#             return redirect('avatar')
-#         return render(request, self.template_name, {'avatar_form': avatar_form})
 
 class UserProfileView(View):
     def get(self, request, *args, **kwargs):
