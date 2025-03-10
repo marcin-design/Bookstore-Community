@@ -4,9 +4,7 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Zaawansowane_Django" />
-    <orderEntry type="module" module-name="WARSZTATY" />
-    <orderEntry type="module" module-name="SCRUM LAB" />
-    <orderEntry type="module" module-name="ONL_PYT_W_28_TDD" />
+    <orderEntry type="module" module-name="Django_nauka" />
+    <orderEntry type="module" module-name="Conf_Room_v2" />
   </component>
 </module>

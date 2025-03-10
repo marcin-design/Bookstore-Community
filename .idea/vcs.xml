@@ -2,6 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../testy_repozytorium/ONL_PYT_W_28_TDD" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../21_02_2025_zadania_ogolnie/Flask_basics/git-credential-manager" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../GITHUB/Conf_Room/Conference-Room" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../GITHUB/Conf_Room_v2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../GITHUB/Django_nauka" vcs="Git" />
   </component>
 </project>
